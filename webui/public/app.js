@@ -1,6 +1,7 @@
 // OPC 制作台前端：五个视图（数据接口 / 数据看板 / 选题引擎 / 创作引擎 / 发布引擎）
 // 无框架、无构建步骤。所有数据来自 webui/server.mjs 的 /api/*。
 
+const STATIC = typeof window !== 'undefined' && !!window.OPC_STATIC; // 静态演示站（gh-pages / Vercel）：只读快照
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -24,7 +25,9 @@ const stamp = (iso) => {
   if (Number.isNaN(+d)) return String(iso);
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 };
-const media = (p, dl) => `/media?p=${encodeURIComponent(p)}${dl ? '&dl=1' : ''}`;
+const media = (p, dl) => (STATIC
+  ? `media/${p}${dl ? '?dl=1' : ''}`
+  : `/media?p=${encodeURIComponent(p)}${dl ? '&dl=1' : ''}`);
 const stText = (s) => ({
   published: '已发布', submitted: '已提交', manual_fallback: '仅预检',
   precheck_failed: '预检未通过', login_required: '待扫码', failed: '失败',
@@ -94,7 +97,24 @@ function toast(msg, bad = false) {
   setTimeout(() => el.remove(), bad ? 6000 : 3000);
 }
 
+const SNAPSHOT = {
+  '/api/data': 'static-data/data.json',
+  '/api/topics': 'static-data/topics.json',
+  '/api/productions': 'static-data/productions.json',
+  '/api/bootstrap': 'static-data/bootstrap.json',
+};
+
 async function api(p, opts = {}) {
+  if (STATIC) {
+    if ((opts.method || 'GET').toUpperCase() !== 'GET') {
+      throw new Error('静态演示站是只读快照，要跑流水线请本地 ./webui/start.sh');
+    }
+    const snap = SNAPSHOT[p.split('?')[0]];
+    if (!snap) throw new Error(`静态演示站没有接口 ${p}`);
+    const rs = await fetch(snap);
+    if (!rs.ok) throw new Error(`快照缺失：${snap}`);
+    return rs.json();
+  }
   const r = await fetch(p, {
     ...opts,
     headers: { 'content-type': 'application/json', ...(opts.headers || {}) },
@@ -875,10 +895,19 @@ window.addEventListener('hashchange', () => switchView(location.hash.slice(1) ||
   if (VIEWS.includes(initial)) state.view = initial;
   for (const t of $$('#tabs .tab')) t.classList.toggle('active', t.dataset.view === state.view);
   for (const v of VIEWS) $('#view-' + v).classList.toggle('active', v === state.view);
+  if (STATIC) {
+    document.body.classList.add('is-static');
+    const b = document.createElement('div');
+    b.className = 'static-banner';
+    b.innerHTML = `<b>静态演示站</b> · 只读数据快照（选题/成片/预检结果），流水线需要本地 <code>./webui/start.sh</code>
+      <a href="https://github.com/auulb/mediaOPC" target="_blank" rel="noreferrer">源码 ↗</a>`;
+    document.body.prepend(b);
+    $('#stopBtn')?.remove();
+  }
   try {
     await loadAll();
   } catch (e) {
     toast(`加载失败：${e.message}`, true);
   }
-  openStream();
+  if (!STATIC) openStream();
 })();
