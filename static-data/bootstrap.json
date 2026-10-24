@@ -1,0 +1,278 @@
+{
+  "root": "/Users/jwj/Documents/WayToAGI/opc2",
+  "pipelines": [
+    {
+      "id": "create-video",
+      "title": "一键出片",
+      "icon": "🎬",
+      "desc": "写稿 → 渲染成片 → 发布预检（可选真投稿）",
+      "accent": "create",
+      "description": "选题 → 脚本/分镜 → Remotion 渲染 → B 站预检（可选投稿）",
+      "configFile": "plugins/publishers/pipelines/create-video.yaml",
+      "steps": [
+        {
+          "id": "script",
+          "skill": "generate-script",
+          "depends_on": [],
+          "contract": null
+        },
+        {
+          "id": "render",
+          "skill": "render-remotion",
+          "depends_on": [
+            "script"
+          ],
+          "contract": "production"
+        },
+        {
+          "id": "publish",
+          "skill": "publish-bilibili",
+          "depends_on": [
+            "render"
+          ],
+          "contract": "publish-record"
+        }
+      ],
+      "options": {
+        "themes": true,
+        "theme": true,
+        "publish": true
+      }
+    },
+    {
+      "id": "trends-analysis",
+      "title": "抓数据 + 选题",
+      "icon": "📈",
+      "desc": "B 站热门 → 看板 → pi 推荐 6 个候选主题",
+      "accent": "data",
+      "description": "M2 数据段端到端：B 站热门 + 自有数据 → dashboard → 6 个候选主题",
+      "configFile": "config/pipeline.yaml",
+      "steps": [
+        {
+          "id": "fetch-bilibili",
+          "skill": "fetch-bilibili-hot",
+          "depends_on": [],
+          "contract": "raw-items"
+        },
+        {
+          "id": "fetch-internal",
+          "skill": "fetch-internal-metrics",
+          "depends_on": [],
+          "contract": "raw-items"
+        },
+        {
+          "id": "build-dashboard",
+          "skill": "build-dashboard",
+          "depends_on": [
+            "fetch-bilibili",
+            "fetch-internal"
+          ],
+          "contract": "dashboard"
+        },
+        {
+          "id": "recommend",
+          "skill": "recommend-themes",
+          "depends_on": [
+            "build-dashboard"
+          ],
+          "contract": "themes"
+        }
+      ],
+      "options": {}
+    },
+    {
+      "id": "echo-chain",
+      "title": "冒烟：两步串联",
+      "icon": "🔗",
+      "desc": "验证 depends_on 与产物拷贝",
+      "accent": "smoke",
+      "description": "A-core M2 冒烟：DAG + output→input 拷贝 + task_status",
+      "configFile": "config/pipeline.yaml",
+      "steps": [
+        {
+          "id": "first",
+          "skill": "echo",
+          "depends_on": [],
+          "contract": null
+        },
+        {
+          "id": "second",
+          "skill": "echo",
+          "depends_on": [
+            "first"
+          ],
+          "contract": null
+        }
+      ],
+      "options": {}
+    },
+    {
+      "id": "echo-fail",
+      "title": "冒烟：预期失败",
+      "icon": "💥",
+      "desc": "验证失败判定与 error.json",
+      "accent": "smoke",
+      "description": "A-core M2 冒烟：前序失败 → 后续 skipped，run 失败",
+      "configFile": "config/pipeline.yaml",
+      "steps": [
+        {
+          "id": "bad",
+          "skill": "echo",
+          "depends_on": [],
+          "contract": null
+        },
+        {
+          "id": "after",
+          "skill": "echo",
+          "depends_on": [
+            "bad"
+          ],
+          "contract": null
+        }
+      ],
+      "options": {}
+    },
+    {
+      "id": "echo-retry-smoke",
+      "title": "冒烟：失败重试",
+      "icon": "🔁",
+      "desc": "验证重试与 token 账本",
+      "accent": "smoke",
+      "description": "A-core M1 冒烟：前两次失败、第三次成功，3 个 attempt 目录都保留",
+      "configFile": "config/pipeline.yaml",
+      "steps": [
+        {
+          "id": "echo",
+          "skill": "echo",
+          "depends_on": [],
+          "contract": null
+        }
+      ],
+      "options": {}
+    },
+    {
+      "id": "echo-smoke",
+      "title": "冒烟：跑单步",
+      "icon": "🧪",
+      "desc": "验证调度器 + pi 通路，秒级完成",
+      "accent": "smoke",
+      "description": "A-core M1 冒烟：正常单步，验证 run.sh、exit_code、output 校验、ledger",
+      "configFile": "config/pipeline.yaml",
+      "steps": [
+        {
+          "id": "echo",
+          "skill": "echo",
+          "depends_on": [],
+          "contract": null
+        }
+      ],
+      "options": {}
+    }
+  ],
+  "themeSources": [
+    {
+      "path": "data/themes/latest.json",
+      "label": "当前选题",
+      "count": 6,
+      "generatedAt": "2026-10-24T09:37:06.491Z",
+      "top": "《绝区零》先导片拆解：2分32秒里藏了几个镜头语言"
+    },
+    {
+      "path": "workspace/real-trends-2/recommend/attempt-1/output.json",
+      "label": "选题 · real-trends-2",
+      "count": 6,
+      "generatedAt": "2026-10-24T09:37:06.491Z",
+      "top": "《绝区零》先导片拆解：2分32秒里藏了几个镜头语言"
+    },
+    {
+      "path": "workspace/demo-trends-1/recommend/attempt-1/output.json",
+      "label": "选题 · demo-trends-1",
+      "count": 6,
+      "generatedAt": "2026-10-24T09:46:30.000Z",
+      "top": "绝区零先导片拆解：3个镜头套路"
+    },
+    {
+      "path": "fixtures/recommend-themes/output.json",
+      "label": "样例选题（fixture）",
+      "count": 6,
+      "generatedAt": "2024-01-16T10:20:00Z",
+      "top": "把「AI 动画生产链」做成系列：第 2 集讲分镜"
+    }
+  ],
+  "runs": [
+    {
+      "runId": "create-video-20261024-185951",
+      "pipelineId": "create-video",
+      "status": "success",
+      "startedAt": "2026-10-24T10:59:52.103Z",
+      "finishedAt": "2026-10-24T11:00:56.373Z",
+      "tokens": 46397,
+      "active": false
+    },
+    {
+      "runId": "echo-smoke-20261024-181909",
+      "pipelineId": "echo-smoke",
+      "status": "success",
+      "startedAt": "2026-10-24T10:19:09.184Z",
+      "finishedAt": "2026-10-24T10:19:17.465Z",
+      "tokens": 5061,
+      "active": false
+    },
+    {
+      "runId": "create-video-20261024-180905",
+      "pipelineId": "create-video",
+      "status": "success",
+      "startedAt": "2026-10-24T10:09:05.537Z",
+      "finishedAt": "2026-10-24T10:10:08.758Z",
+      "tokens": 51540,
+      "active": false
+    },
+    {
+      "runId": "webui-smoke-1",
+      "pipelineId": "echo-smoke",
+      "status": "success",
+      "startedAt": "2026-10-24T10:05:50.911Z",
+      "finishedAt": "2026-10-24T10:05:59.376Z",
+      "tokens": 6354,
+      "active": false
+    },
+    {
+      "runId": "ui-probe",
+      "pipelineId": "echo-smoke",
+      "status": "success",
+      "startedAt": "2026-10-24T10:03:03.285Z",
+      "finishedAt": "2026-10-24T10:03:11.754Z",
+      "tokens": 5160,
+      "active": false
+    },
+    {
+      "runId": "demo-video-2",
+      "pipelineId": "create-video",
+      "status": "success",
+      "startedAt": "2026-10-24T09:50:33.260Z",
+      "finishedAt": "2026-10-24T09:51:48.546Z",
+      "tokens": 52411,
+      "active": false
+    },
+    {
+      "runId": "demo-video-1",
+      "pipelineId": "create-video",
+      "status": "failed",
+      "startedAt": "2026-10-24T09:46:40.865Z",
+      "finishedAt": "2026-10-24T09:47:50.469Z",
+      "tokens": 44571,
+      "active": false
+    },
+    {
+      "runId": "demo-trends-1",
+      "pipelineId": "trends-analysis",
+      "status": "success",
+      "startedAt": "2026-10-24T09:44:43.698Z",
+      "finishedAt": "2026-10-24T09:46:29.006Z",
+      "tokens": 179066,
+      "active": false
+    }
+  ],
+  "active": null,
+  "publishEnabledHint": "默认只预检；勾选真实投稿才会设置 OPC_PUBLISH_ENABLED=1"
+}

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OPC 制作台 · 数据 → 选题 → 创作 → 发布</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="dot"></span>OPC 制作台 <small>数据 → 选题 → 创作 → 发布</small></div>
+    <nav class="tabs" id="tabs">
+      <a class="tab" data-view="sources">数据接口</a>
+      <a class="tab" data-view="dashboard">数据看板</a>
+      <a class="tab" data-view="topics">选题引擎</a>
+      <a class="tab" data-view="create">创作引擎</a>
+      <a class="tab" data-view="publish">发布引擎</a>
+    </nav>
+    <div class="right">
+      <span id="globalStatus" class="pill">空闲</span>
+    </div>
+  </header>
+
+  <main>
+    <section id="view-sources" class="view"></section>
+    <section id="view-dashboard" class="view"></section>
+    <section id="view-topics" class="view"></section>
+    <section id="view-create" class="view"></section>
+    <section id="view-publish" class="view"></section>
+  </main>
+
+  <div class="logbar" id="logbar">
+    <div class="handle" id="logHandle">
+      <span class="title">运行日志</span>
+      <span id="logHint" class="muted">—</span>
+      <span class="right">
+        <span id="logCount" class="muted"></span>
+        <label class="tiny muted"><input type="checkbox" id="autoscroll" checked /> 自动滚动</label>
+        <button class="small" id="stopBtn" style="display:none">停止</button>
+      </span>
+    </div>
+    <div id="log"></div>
+  </div>
+
+  <dialog id="dlg">
+    <h3 id="dlgTitle">确认</h3>
+    <div id="dlgBody"></div>
+    <div class="row" style="justify-content:flex-end;margin-top:16px">
+      <button id="dlgCancel" class="ghost">取消</button>
+      <button id="dlgOk" class="primary">确认</button>
+    </div>
+  </dialog>
+
+  <div id="toast"></div>
+  <script src="static-mode.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

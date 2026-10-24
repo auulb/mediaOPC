@@ -1,0 +1,712 @@
+{
+  "dashboard": {
+    "generatedAt": "2026-10-24T09:45:46.145Z",
+    "external": {
+      "topTopics": [
+        {
+          "topic": "手机游戏",
+          "heat": 100,
+          "growth": "+0%",
+          "itemCount": 1,
+          "platforms": [
+            "bilibili"
+          ],
+          "sourceRef": [
+            {
+              "source": "raw-0-bilibili-hot",
+              "pointer": "/items/0",
+              "itemId": "BV1U3n46GEzY"
+            }
+          ]
+        },
+        {
+          "topic": "出行",
+          "heat": 58,
+          "growth": "+0%",
+          "itemCount": 1,
+          "platforms": [
+            "bilibili"
+          ],
+          "sourceRef": [
+            {
+              "source": "raw-0-bilibili-hot",
+              "pointer": "/items/1",
+              "itemId": "BV12qnt6VEM1"
+            }
+          ]
+        },
+        {
+          "topic": "搞笑",
+          "heat": 24.9,
+          "growth": "+0%",
+          "itemCount": 1,
+          "platforms": [
+            "bilibili"
+          ],
+          "sourceRef": [
+            {
+              "source": "raw-0-bilibili-hot",
+              "pointer": "/items/2",
+              "itemId": "BV111na6WExX"
+            }
+          ]
+        }
+      ],
+      "flowDirection": {
+        "bilibili": {
+          "value": 100,
+          "sourceRef": [
+            {
+              "source": "raw-0-bilibili-hot",
+              "pointer": "/items/0",
+              "itemId": "BV1U3n46GEzY"
+            },
+            {
+              "source": "raw-0-bilibili-hot",
+              "pointer": "/items/1",
+              "itemId": "BV12qnt6VEM1"
+            },
+            {
+              "source": "raw-0-bilibili-hot",
+              "pointer": "/items/2",
+              "itemId": "BV111na6WExX"
+            }
+          ]
+        }
+      },
+      "topItems": [
+        {
+          "id": "BV1U3n46GEzY",
+          "title": "《绝区零》先导演示丨挽昼",
+          "platform": "bilibili",
+          "views": 2322068,
+          "engagement": 0.3755,
+          "velocity": "rising",
+          "tags": [
+            "手机游戏"
+          ],
+          "sourceRef": [
+            {
+              "source": "raw-0-bilibili-hot",
+              "pointer": "/items/0",
+              "itemId": "BV1U3n46GEzY"
+            }
+          ]
+        },
+        {
+          "id": "BV12qnt6VEM1",
+          "title": "人性、欲望与奇观，自驾拉斯维加斯，现实夜之城什么样？",
+          "platform": "bilibili",
+          "views": 1345786,
+          "engagement": 0.0561,
+          "velocity": "stable",
+          "tags": [
+            "出行"
+          ],
+          "sourceRef": [
+            {
+              "source": "raw-0-bilibili-hot",
+              "pointer": "/items/1",
+              "itemId": "BV12qnt6VEM1"
+            }
+          ]
+        },
+        {
+          "id": "BV111na6WExX",
+          "title": "《纯阳真气》",
+          "platform": "bilibili",
+          "views": 577891,
+          "engagement": 0.099,
+          "velocity": "stable",
+          "tags": [
+            "搞笑"
+          ],
+          "sourceRef": [
+            {
+              "source": "raw-0-bilibili-hot",
+              "pointer": "/items/2",
+              "itemId": "BV111na6WExX"
+            }
+          ]
+        }
+      ]
+    },
+    "internal": {
+      "episodes": [
+        {
+          "id": "pub_20240115_bili_001",
+          "themeId": "theme_20240115_001",
+          "title": "30秒看懂：AI 动画是怎么做出来的",
+          "platform": "bilibili",
+          "window": "latest",
+          "views": 5553126,
+          "likes": 277343,
+          "comments": 89450,
+          "engagement": 0.0942,
+          "tokensSpent": null,
+          "roi": null,
+          "sourceRef": [
+            {
+              "source": "raw-1-internal-metrics",
+              "pointer": "/items/0",
+              "itemId": "BV1xx411c7mD"
+            }
+          ]
+        }
+      ],
+      "avgEngagement": {
+        "value": 0.0942,
+        "sourceRef": [
+          {
+            "source": "raw-1-internal-metrics",
+            "pointer": "/items/0",
+            "itemId": "BV1xx411c7mD"
+          }
+        ]
+      },
+      "topPerformers": [
+        "pub_20240115_bili_001"
+      ]
+    },
+    "tokens": {
+      "today": 988249,
+      "thisWeek": 988249,
+      "costToday": 0.006,
+      "budget": 500000,
+      "utilizationRate": 1.9765,
+      "byStep": [
+        {
+          "stepId": "publish-bilibili",
+          "tokens": 526091,
+          "cost": 0
+        },
+        {
+          "stepId": "fetch-internal",
+          "tokens": 176603,
+          "cost": 0
+        },
+        {
+          "stepId": "build-dashboard",
+          "tokens": 89645,
+          "cost": 0
+        },
+        {
+          "stepId": "recommend",
+          "tokens": 70591,
+          "cost": 0
+        },
+        {
+          "stepId": "generate-script",
+          "tokens": 53318,
+          "cost": 0
+        },
+        {
+          "stepId": "fetch-bilibili",
+          "tokens": 32106,
+          "cost": 0
+        },
+        {
+          "stepId": "echo",
+          "tokens": 20031,
+          "cost": 0
+        },
+        {
+          "stepId": "render-remotion",
+          "tokens": 11306,
+          "cost": 0
+        },
+        {
+          "stepId": "first",
+          "tokens": 5206,
+          "cost": 0.003
+        },
+        {
+          "stepId": "second",
+          "tokens": 3352,
+          "cost": 0.003
+        }
+      ],
+      "sourceRef": [
+        {
+          "source": "token-ledger",
+          "pointer": ""
+        }
+      ]
+    },
+    "tasks": {
+      "summary": {
+        "success": 13,
+        "failed": 0,
+        "running": 1,
+        "pending": 1
+      },
+      "recent": [
+        {
+          "runId": "demo-trends-1",
+          "pipelineId": "trends-analysis",
+          "stepId": "recommend",
+          "skill": "recommend-themes",
+          "status": "pending",
+          "attempt": null,
+          "createdAt": "2026-10-24T09:44:43.700Z",
+          "startedAt": null,
+          "finishedAt": null,
+          "durationMs": null,
+          "tokens": 0,
+          "costUsd": 0,
+          "output": null,
+          "error": null
+        },
+        {
+          "runId": "demo-trends-1",
+          "pipelineId": "trends-analysis",
+          "stepId": "build-dashboard",
+          "skill": "build-dashboard",
+          "status": "running",
+          "attempt": null,
+          "createdAt": "2026-10-24T09:44:43.700Z",
+          "startedAt": "2026-10-24T09:45:34.649Z",
+          "finishedAt": null,
+          "durationMs": null,
+          "tokens": 0,
+          "costUsd": 0,
+          "output": null,
+          "error": null
+        },
+        {
+          "runId": "demo-trends-1",
+          "pipelineId": "trends-analysis",
+          "stepId": "fetch-internal",
+          "skill": "fetch-internal-metrics",
+          "status": "success",
+          "attempt": 1,
+          "createdAt": "2026-10-24T09:44:43.700Z",
+          "startedAt": "2026-10-24T09:44:55.784Z",
+          "finishedAt": "2026-10-24T09:45:34.624Z",
+          "durationMs": 38840,
+          "tokens": 92211,
+          "costUsd": 0,
+          "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/demo-trends-1/fetch-internal/attempt-1/output.json",
+          "error": null
+        },
+        {
+          "runId": "demo-trends-1",
+          "pipelineId": "trends-analysis",
+          "stepId": "fetch-bilibili",
+          "skill": "fetch-bilibili-hot",
+          "status": "success",
+          "attempt": 1,
+          "createdAt": "2026-10-24T09:44:43.700Z",
+          "startedAt": "2026-10-24T09:44:43.701Z",
+          "finishedAt": "2026-10-24T09:44:55.776Z",
+          "durationMs": 12075,
+          "tokens": 11174,
+          "costUsd": 0,
+          "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/demo-trends-1/fetch-bilibili/attempt-1/output.json",
+          "error": null
+        },
+        {
+          "runId": "real-trends-2",
+          "pipelineId": "trends-analysis",
+          "stepId": "recommend",
+          "skill": "recommend-themes",
+          "status": "success",
+          "attempt": 1,
+          "createdAt": "2026-10-24T09:36:02.524Z",
+          "startedAt": "2026-10-24T09:37:12.788Z",
+          "finishedAt": "2026-10-24T09:37:53.630Z",
+          "durationMs": 40842,
+          "tokens": 70591,
+          "costUsd": 0,
+          "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/real-trends-2/recommend/attempt-1/output.json",
+          "error": null
+        },
+        {
+          "runId": "real-trends-2",
+          "pipelineId": "trends-analysis",
+          "stepId": "build-dashboard",
+          "skill": "build-dashboard",
+          "status": "success",
+          "attempt": 1,
+          "createdAt": "2026-10-24T09:36:02.524Z",
+          "startedAt": "2026-10-24T09:36:45.819Z",
+          "finishedAt": "2026-10-24T09:37:12.783Z",
+          "durationMs": 26964,
+          "tokens": 63787,
+          "costUsd": 0,
+          "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/real-trends-2/build-dashboard/attempt-1/output.json",
+          "error": null
+        },
+        {
+          "runId": "real-trends-2",
+          "pipelineId": "trends-analysis",
+          "stepId": "fetch-internal",
+          "skill": "fetch-internal-metrics",
+          "status": "success",
+          "attempt": 1,
+          "createdAt": "2026-10-24T09:36:02.524Z",
+          "startedAt": "2026-10-24T09:36:16.864Z",
+          "finishedAt": "2026-10-24T09:36:45.812Z",
+          "durationMs": 28948,
+          "tokens": 63107,
+          "costUsd": 0,
+          "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/real-trends-2/fetch-internal/attempt-1/output.json",
+          "error": null
+        },
+        {
+          "runId": "real-trends-2",
+          "pipelineId": "trends-analysis",
+          "stepId": "fetch-bilibili",
+          "skill": "fetch-bilibili-hot",
+          "status": "success",
+          "attempt": 1,
+          "createdAt": "2026-10-24T09:36:02.524Z",
+          "startedAt": "2026-10-24T09:36:02.526Z",
+          "finishedAt": "2026-10-24T09:36:16.853Z",
+          "durationMs": 14327,
+          "tokens": 10529,
+          "costUsd": 0,
+          "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/real-trends-2/fetch-bilibili/attempt-1/output.json",
+          "error": null
+        },
+        {
+          "runId": "real-trends-1",
+          "pipelineId": "trends-analysis",
+          "stepId": "build-dashboard",
+          "skill": "build-dashboard",
+          "status": "success",
+          "attempt": 1,
+          "createdAt": "2026-10-24T09:33:08.060Z",
+          "startedAt": "2026-10-24T09:33:42.189Z",
+          "finishedAt": "2026-10-24T09:34:00.893Z",
+          "durationMs": 18704,
+          "tokens": 25858,
+          "costUsd": 0,
+          "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/real-trends-1/build-dashboard/attempt-1/output.json",
+          "error": null
+        },
+        {
+          "runId": "real-trends-1",
+          "pipelineId": "trends-analysis",
+          "stepId": "fetch-internal",
+          "skill": "fetch-internal-metrics",
+          "status": "success",
+          "attempt": 1,
+          "createdAt": "2026-10-24T09:33:08.060Z",
+          "startedAt": "2026-10-24T09:33:20.012Z",
+          "finishedAt": "2026-10-24T09:33:42.185Z",
+          "durationMs": 22173,
+          "tokens": 21285,
+          "costUsd": 0,
+          "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/real-trends-1/fetch-internal/attempt-1/output.json",
+          "error": null
+        }
+      ],
+      "sourceRef": [
+        {
+          "source": "task-status",
+          "pointer": "/tasks"
+        }
+      ]
+    },
+    "budget": {
+      "version": 1,
+      "daily": 500000,
+      "weekly": 3000000,
+      "monthly": 10000000,
+      "alertThresholds": {
+        "warning": 0.8,
+        "critical": 0.95
+      },
+      "stepWarnTokens": 100000,
+      "stepLimits": {
+        "fetch-data": 5000,
+        "build-dashboard": 10000,
+        "recommend-themes": 50000,
+        "generate-script": 100000,
+        "create-animation": 200000
+      }
+    },
+    "files": [
+      {
+        "file": "dashboard/dashboard.json",
+        "mtime": "2026-10-24T09:45:46.158Z"
+      },
+      {
+        "file": "dashboard/external_trends.json",
+        "mtime": "2026-10-24T09:45:46.157Z"
+      },
+      {
+        "file": "dashboard/internal_performance.json",
+        "mtime": "2026-10-24T09:45:46.157Z"
+      },
+      {
+        "file": "dashboard/token_usage.json",
+        "mtime": "2026-10-24T09:45:46.157Z"
+      },
+      {
+        "file": "dashboard/task_status.json",
+        "mtime": "2026-10-24T13:15:59.241Z"
+      }
+    ]
+  },
+  "sources": {
+    "generatedAt": "2026-10-24T09:45:46.145Z",
+    "sources": [
+      {
+        "id": "raw-0-bilibili-hot",
+        "dataSource": "bilibili-hot",
+        "kind": "raw-items",
+        "timestamp": "2026-10-24T09:26:30.983Z",
+        "file": "workspace/demo-trends-1/fetch-bilibili/attempt-1/output.json",
+        "count": 3,
+        "fields": [
+          "id",
+          "title",
+          "url",
+          "views",
+          "likes",
+          "comments",
+          "shares",
+          "favorites",
+          "tags",
+          "category",
+          "durationSec",
+          "publishDate",
+          "publishedAt",
+          "channel",
+          "metrics"
+        ],
+        "items": [
+          {
+            "id": "BV1U3n46GEzY",
+            "title": "《绝区零》先导演示丨挽昼",
+            "url": "https://www.bilibili.com/video/BV1U3n46GEzY",
+            "platform": "bilibili",
+            "channel": "绝区零",
+            "views": 2322068,
+            "likes": 417706,
+            "comments": 27539,
+            "shares": 163351,
+            "favorites": 263243,
+            "engagement": 0.3755,
+            "viewsPerHour": 426698.59,
+            "velocity": "rising",
+            "tags": [
+              "手机游戏"
+            ],
+            "category": "手机游戏",
+            "durationSec": 83,
+            "publishDate": "2026-10-24",
+            "internal": null
+          },
+          {
+            "id": "BV12qnt6VEM1",
+            "title": "人性、欲望与奇观，自驾拉斯维加斯，现实夜之城什么样？",
+            "url": "https://www.bilibili.com/video/BV12qnt6VEM1",
+            "platform": "bilibili",
+            "channel": "超Carry的柴西",
+            "views": 1345786,
+            "likes": 55774,
+            "comments": 2001,
+            "shares": 1604,
+            "favorites": 16152,
+            "engagement": 0.0561,
+            "viewsPerHour": 64889.31,
+            "velocity": "stable",
+            "tags": [
+              "出行"
+            ],
+            "category": "出行",
+            "durationSec": 1542,
+            "publishDate": "2026-10-23",
+            "internal": null
+          },
+          {
+            "id": "BV111na6WExX",
+            "title": "《纯阳真气》",
+            "url": "https://www.bilibili.com/video/BV111na6WExX",
+            "platform": "bilibili",
+            "channel": "伤心欲茄222",
+            "views": 577891,
+            "likes": 52130,
+            "comments": 1479,
+            "shares": 1121,
+            "favorites": 2455,
+            "engagement": 0.099,
+            "viewsPerHour": 106192.1,
+            "velocity": "stable",
+            "tags": [
+              "搞笑"
+            ],
+            "category": "搞笑",
+            "durationSec": 105,
+            "publishDate": "2026-10-24",
+            "internal": null
+          }
+        ]
+      },
+      {
+        "id": "raw-1-internal-metrics",
+        "dataSource": "internal-metrics",
+        "kind": "raw-items",
+        "timestamp": "2026-10-24T09:33:36.431Z",
+        "file": "workspace/demo-trends-1/fetch-internal/attempt-1/output.json",
+        "count": 1,
+        "fields": [
+          "id",
+          "title",
+          "url",
+          "views",
+          "likes",
+          "comments",
+          "shares",
+          "favorites",
+          "tags",
+          "durationSec",
+          "publishDate",
+          "publishedAt",
+          "channel",
+          "metrics",
+          "internal"
+        ],
+        "items": [
+          {
+            "id": "BV1xx411c7mD",
+            "title": "30秒看懂：AI 动画是怎么做出来的",
+            "url": "https://www.bilibili.com/video/BV1xx411c7mD",
+            "platform": "internal",
+            "channel": "碧诗",
+            "views": 5553126,
+            "likes": 277343,
+            "comments": 89450,
+            "shares": 28978,
+            "favorites": 127545,
+            "engagement": 0.0942,
+            "viewsPerHour": 228.49,
+            "velocity": "unknown",
+            "tags": [
+              "AI",
+              "动画",
+              "教程",
+              "Remotion"
+            ],
+            "category": null,
+            "durationSec": 2055,
+            "publishDate": "2024-01-15",
+            "internal": {
+              "publishId": "pub_20240115_bili_001",
+              "themeId": "theme_20240115_001",
+              "platform": "bilibili",
+              "window": "latest",
+              "hoursSincePublish": 24303.5
+            }
+          }
+        ]
+      }
+    ],
+    "creators": [
+      {
+        "name": "碧诗",
+        "internal": true,
+        "items": 1,
+        "views": 5553126,
+        "likes": 277343,
+        "engagementSum": 0.0942,
+        "rising": 0,
+        "tags": [
+          "AI",
+          "动画",
+          "教程",
+          "Remotion"
+        ],
+        "ids": [
+          "BV1xx411c7mD"
+        ],
+        "avgEngagement": 0.0942
+      },
+      {
+        "name": "绝区零",
+        "internal": false,
+        "items": 1,
+        "views": 2322068,
+        "likes": 417706,
+        "engagementSum": 0.3755,
+        "rising": 1,
+        "tags": [
+          "手机游戏"
+        ],
+        "ids": [
+          "BV1U3n46GEzY"
+        ],
+        "avgEngagement": 0.3755
+      },
+      {
+        "name": "超Carry的柴西",
+        "internal": false,
+        "items": 1,
+        "views": 1345786,
+        "likes": 55774,
+        "engagementSum": 0.0561,
+        "rising": 0,
+        "tags": [
+          "出行"
+        ],
+        "ids": [
+          "BV12qnt6VEM1"
+        ],
+        "avgEngagement": 0.0561
+      },
+      {
+        "name": "伤心欲茄222",
+        "internal": false,
+        "items": 1,
+        "views": 577891,
+        "likes": 52130,
+        "engagementSum": 0.099,
+        "rising": 0,
+        "tags": [
+          "搞笑"
+        ],
+        "ids": [
+          "BV111na6WExX"
+        ],
+        "avgEngagement": 0.099
+      }
+    ],
+    "coverage": {
+      "platforms": [
+        "bilibili"
+      ],
+      "hasDouyin": false,
+      "hasCreatorMetrics": true,
+      "gaps": [
+        "抖音热门 / 同赛道数据未接入（adapter 未实现）",
+        "平台只返回 Top3 样本，样本量偏小（fetch-bilibili 的 limit 参数）"
+      ]
+    }
+  },
+  "schedule": [
+    {
+      "name": "echo-smoke-daily",
+      "cron": "0 9 * * *",
+      "pipeline": "echo-smoke",
+      "enabled": false,
+      "manualApproval": false
+    },
+    {
+      "name": "daily-trends-analysis",
+      "cron": "0 9 * * *",
+      "pipeline": "trends-analysis",
+      "enabled": false,
+      "manualApproval": false
+    },
+    {
+      "name": "echo-chain-daily",
+      "cron": "0 9 * * *",
+      "pipeline": "echo-chain",
+      "enabled": false,
+      "manualApproval": false
+    }
+  ]
+}

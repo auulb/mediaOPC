@@ -1,0 +1,585 @@
+{
+  "productions": [
+    {
+      "schemaVersion": 1,
+      "productionId": "prod_20261024_theme_20261024_003_create-20261024-211127",
+      "themeId": "theme_20261024_003",
+      "createdAt": "2026-10-24T13:12:23.249Z",
+      "renderer": "remotion",
+      "template": "remotion/explainer-30s",
+      "video": {
+        "path": "data/productions/prod_20261024_theme_20261024_003_create-20261024-211127/final.mp4",
+        "durationSec": 30,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sizeBytes": 650225,
+        "codec": "h264",
+        "sha256": "941a2122892903616976bffda768c7c918fcd926f857ed15e2baea48a1bcc116"
+      },
+      "cover": {
+        "path": "data/productions/prod_20261024_theme_20261024_003_create-20261024-211127/cover.jpg",
+        "width": 1920,
+        "height": 1080
+      },
+      "coverPortrait": {
+        "path": "data/productions/prod_20261024_theme_20261024_003_create-20261024-211127/cover-portrait.jpg",
+        "width": 1080,
+        "height": 1920
+      },
+      "script": {
+        "path": "data/scripts/create-20261024-211127/theme_20261024_003/script.md",
+        "storyboardPath": "data/productions/prod_20261024_theme_20261024_003_create-20261024-211127/storyboard.json"
+      },
+      "metadataDraft": {
+        "title": "《纯阳真气》为什么好笑：3 个节奏点逐秒复刻",
+        "description": "把这段喜剧短片拆成「铺垫—错位—收尾」三拍，每拍配一个可复用的节奏参数，再用 AI 动画重演一遍同样的节拍。看完你能直接照着改自己的段子。",
+        "tags": [
+          "纯阳真气",
+          "喜剧节奏",
+          "三拍结构",
+          "AI动画",
+          "搞笑拆解",
+          "短视频剪辑"
+        ],
+        "category": "纯阳真气"
+      },
+      "targetPlatforms": [
+        "bilibili",
+        "douyin"
+      ],
+      "sourceRef": {
+        "themesFile": "data/scripts/create-20261024-211127/theme_20261024_003/themes.json",
+        "themeId": "theme_20261024_003"
+      },
+      "runId": "create-20261024-211127",
+      "renderDir": "workspace/create-20261024-211127/render/attempt-1",
+      "publish": {
+        "status": "manual_fallback",
+        "url": null,
+        "platformVideoId": null,
+        "publishId": "pub_20261024_bilibili_theme_20261024_003_ww19-9g7q",
+        "error": {
+          "code": "PUBLISH_DISABLED",
+          "message": "预检通过，但未启用真实投稿（OPC_PUBLISH_ENABLED≠1）：本次未上传、未提交"
+        },
+        "precheck": {
+          "passed": true,
+          "checks": [
+            {
+              "name": "duration",
+              "passed": true,
+              "detail": "30s / 上限 600s"
+            },
+            {
+              "name": "fileSize",
+              "passed": true,
+              "detail": "0.6MB / 上限 8192MB"
+            },
+            {
+              "name": "resolution",
+              "passed": true,
+              "detail": "1920x1080"
+            },
+            {
+              "name": "titleLength",
+              "passed": true,
+              "detail": "22/80"
+            },
+            {
+              "name": "tagCount",
+              "passed": true,
+              "detail": "6/10"
+            },
+            {
+              "name": "sensitiveWords",
+              "passed": true,
+              "detail": "未命中"
+            },
+            {
+              "name": "coverExists",
+              "passed": true,
+              "detail": "data/productions/prod_20261024_theme_20261024_003_create-20261024-211127/cover.jpg"
+            }
+          ]
+        }
+      },
+      "videoExists": true,
+      "coverExists": true,
+      "coverPortraitExists": true
+    },
+    {
+      "schemaVersion": 1,
+      "productionId": "prod_20261024_theme_20261024_001_cover-test",
+      "themeId": "theme_20261024_001",
+      "createdAt": "2026-10-24T12:39:41.043Z",
+      "renderer": "remotion",
+      "template": "remotion/explainer-30s",
+      "video": {
+        "path": "data/productions/prod_20261024_theme_20261024_001_cover-test/final.mp4",
+        "durationSec": 45,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sizeBytes": 1084510,
+        "codec": "h264",
+        "sha256": "7f5a0348246ad32ab75d9b2c718e1578dcebbc99823a0403774befb5e582441e"
+      },
+      "cover": {
+        "path": "data/productions/prod_20261024_theme_20261024_001_cover-test/cover.jpg",
+        "width": 1920,
+        "height": 1080
+      },
+      "coverPortrait": {
+        "path": "data/productions/prod_20261024_theme_20261024_001_cover-test/cover-portrait.jpg",
+        "width": 1080,
+        "height": 1920
+      },
+      "script": {
+        "path": "data/scripts/demo-video-2/theme_20261024_001/script.md",
+        "storyboardPath": "data/productions/prod_20261024_theme_20261024_001_cover-test/storyboard.json"
+      },
+      "metadataDraft": {
+        "title": "绝区零先导片拆解：3个镜头套路，45秒看懂它为什么燃",
+        "description": "逐帧拆解《绝区零》先导片的剪辑节奏与镜头语言，用 3 个可复用的镜头套路解释这段预告为什么让人上头，手游玩家和剪辑新手都能直接抄作业。",
+        "tags": [
+          "绝区零",
+          "先导片拆解",
+          "镜头语言",
+          "游戏PV",
+          "剪辑节奏",
+          "分镜",
+          "视频教程"
+        ],
+        "category": "绝区零"
+      },
+      "targetPlatforms": [
+        "bilibili"
+      ],
+      "sourceRef": {
+        "themesFile": "data/scripts/demo-video-2/theme_20261024_001/themes.json",
+        "themeId": "theme_20261024_001"
+      },
+      "runId": "cover-test",
+      "renderDir": "workspace/cover-test/render/attempt-1",
+      "publish": null,
+      "videoExists": true,
+      "coverExists": true,
+      "coverPortraitExists": true
+    },
+    {
+      "schemaVersion": 1,
+      "productionId": "prod_20261024_theme_20261024_001_create-video-20261024-185951",
+      "themeId": "theme_20261024_001",
+      "createdAt": "2026-10-24T11:00:39.343Z",
+      "renderer": "remotion",
+      "template": "remotion/explainer-30s",
+      "video": {
+        "path": "data/productions/prod_20261024_theme_20261024_001_create-video-20261024-185951/final.mp4",
+        "durationSec": 45,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sizeBytes": 1150308,
+        "codec": "h264",
+        "sha256": "3f672d6a180180a72dbd9e2fbc0f9dce34716ba2289fdaf0accbe1984e9cc888"
+      },
+      "cover": {
+        "path": "data/productions/prod_20261024_theme_20261024_001_create-video-20261024-185951/cover.jpg",
+        "width": 1920,
+        "height": 1080
+      },
+      "script": {
+        "path": "data/scripts/create-video-20261024-185951/theme_20261024_001/script.md",
+        "storyboardPath": "data/productions/prod_20261024_theme_20261024_001_create-video-20261024-185951/storyboard.json"
+      },
+      "metadataDraft": {
+        "title": "《绝区零》先导片拆解：3 个镜头就把角色气场立住",
+        "description": "逐帧拆解《绝区零》先导片的镜头语言：从反打入场到残影收尾，三个镜头讲清运镜逻辑，并给出可直接复用的 AI 复刻 prompt 思路。",
+        "tags": [
+          "绝区零",
+          "先导片拆解",
+          "镜头语言",
+          "运镜",
+          "手游PV",
+          "AI动画"
+        ],
+        "category": "绝区零"
+      },
+      "targetPlatforms": [
+        "bilibili"
+      ],
+      "sourceRef": {
+        "themesFile": "data/scripts/create-video-20261024-185951/theme_20261024_001/themes.json",
+        "themeId": "theme_20261024_001"
+      },
+      "coverPortrait": null,
+      "runId": "create-video-20261024-185951",
+      "renderDir": "workspace/create-video-20261024-185951/render/attempt-1",
+      "publish": {
+        "status": "manual_fallback",
+        "url": null,
+        "platformVideoId": null,
+        "publishId": "pub_20261024_bilibili_theme_20261024_001_wylk-fr3o",
+        "error": {
+          "code": "PUBLISH_DISABLED",
+          "message": "预检通过，但未启用真实投稿（OPC_PUBLISH_ENABLED≠1）：本次未上传、未提交"
+        },
+        "precheck": {
+          "passed": true,
+          "checks": [
+            {
+              "name": "duration",
+              "passed": true,
+              "detail": "45s / 上限 600s"
+            },
+            {
+              "name": "fileSize",
+              "passed": true,
+              "detail": "1.1MB / 上限 8192MB"
+            },
+            {
+              "name": "resolution",
+              "passed": true,
+              "detail": "1920x1080"
+            },
+            {
+              "name": "titleLength",
+              "passed": true,
+              "detail": "24/80"
+            },
+            {
+              "name": "tagCount",
+              "passed": true,
+              "detail": "6/10"
+            },
+            {
+              "name": "sensitiveWords",
+              "passed": true,
+              "detail": "未命中"
+            },
+            {
+              "name": "coverExists",
+              "passed": true,
+              "detail": "data/productions/prod_20261024_theme_20261024_001_create-video-20261024-185951/cover.jpg"
+            }
+          ]
+        }
+      },
+      "videoExists": true,
+      "coverExists": true,
+      "coverPortraitExists": false
+    },
+    {
+      "schemaVersion": 1,
+      "productionId": "prod_20261024_theme_20261024_003_create-video-20261024-180905",
+      "themeId": "theme_20261024_003",
+      "createdAt": "2026-10-24T10:09:51.367Z",
+      "renderer": "remotion",
+      "template": "remotion/explainer-30s",
+      "video": {
+        "path": "data/productions/prod_20261024_theme_20261024_003_create-video-20261024-180905/final.mp4",
+        "durationSec": 30,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sizeBytes": 677585,
+        "codec": "h264",
+        "sha256": "c4241803bfd9d12054e2d50aecc18a5fd25ec592e4014ffb07b919d375ea1846"
+      },
+      "cover": {
+        "path": "data/productions/prod_20261024_theme_20261024_003_create-video-20261024-180905/cover.jpg",
+        "width": 1920,
+        "height": 1080
+      },
+      "script": {
+        "path": "data/scripts/create-video-20261024-180905/theme_20261024_003/script.md",
+        "storyboardPath": "data/productions/prod_20261024_theme_20261024_003_create-video-20261024-180905/storyboard.json"
+      },
+      "metadataDraft": {
+        "title": "纯阳真气式反差梗：一分钱特效怎么变成笑点",
+        "description": "30 秒拆解「正经人设 + 离谱台词」的反差结构：铺垫、断点、放大、收缩四步，把零成本特效直接做成包袱本身。适合轻喜剧短剧、短视频刷梗人群复用。",
+        "tags": [
+          "反差梗",
+          "纯阳真气",
+          "搞笑短剧",
+          "低成本",
+          "节奏包袱",
+          "短视频结构"
+        ],
+        "category": "反差梗"
+      },
+      "targetPlatforms": [
+        "bilibili",
+        "douyin"
+      ],
+      "sourceRef": {
+        "themesFile": "data/scripts/create-video-20261024-180905/theme_20261024_003/themes.json",
+        "themeId": "theme_20261024_003"
+      },
+      "coverPortrait": null,
+      "runId": "create-video-20261024-180905",
+      "renderDir": "workspace/create-video-20261024-180905/render/attempt-1",
+      "publish": {
+        "status": "manual_fallback",
+        "url": null,
+        "platformVideoId": null,
+        "publishId": "pub_20261024_bilibili_theme_20261024_003_xbzg-mhbv",
+        "error": {
+          "code": "PUBLISH_DISABLED",
+          "message": "预检通过，但未启用真实投稿（OPC_PUBLISH_ENABLED≠1）：本次未上传、未提交"
+        },
+        "precheck": {
+          "passed": true,
+          "checks": [
+            {
+              "name": "duration",
+              "passed": true,
+              "detail": "30s / 上限 600s"
+            },
+            {
+              "name": "fileSize",
+              "passed": true,
+              "detail": "0.6MB / 上限 8192MB"
+            },
+            {
+              "name": "resolution",
+              "passed": true,
+              "detail": "1920x1080"
+            },
+            {
+              "name": "titleLength",
+              "passed": true,
+              "detail": "20/80"
+            },
+            {
+              "name": "tagCount",
+              "passed": true,
+              "detail": "6/10"
+            },
+            {
+              "name": "sensitiveWords",
+              "passed": true,
+              "detail": "未命中"
+            },
+            {
+              "name": "coverExists",
+              "passed": true,
+              "detail": "data/productions/prod_20261024_theme_20261024_003_create-video-20261024-180905/cover.jpg"
+            }
+          ]
+        }
+      },
+      "videoExists": true,
+      "coverExists": true,
+      "coverPortraitExists": false
+    },
+    {
+      "schemaVersion": 1,
+      "productionId": "prod_20261024_theme_20261024_001_demo-video-2",
+      "themeId": "theme_20261024_001",
+      "createdAt": "2026-10-24T09:51:26.481Z",
+      "renderer": "remotion",
+      "template": "remotion/explainer-30s",
+      "video": {
+        "path": "data/productions/prod_20261024_theme_20261024_001_demo-video-2/final.mp4",
+        "durationSec": 45,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sizeBytes": 1084510,
+        "codec": "h264",
+        "sha256": "7f5a0348246ad32ab75d9b2c718e1578dcebbc99823a0403774befb5e582441e"
+      },
+      "cover": {
+        "path": "data/productions/prod_20261024_theme_20261024_001_demo-video-2/cover.jpg",
+        "width": 1920,
+        "height": 1080
+      },
+      "script": {
+        "path": "data/scripts/demo-video-2/theme_20261024_001/script.md",
+        "storyboardPath": "data/productions/prod_20261024_theme_20261024_001_demo-video-2/storyboard.json"
+      },
+      "metadataDraft": {
+        "title": "绝区零先导片拆解：3个镜头套路，45秒看懂它为什么燃",
+        "description": "逐帧拆解《绝区零》先导片的剪辑节奏与镜头语言，用 3 个可复用的镜头套路解释这段预告为什么让人上头，手游玩家和剪辑新手都能直接抄作业。",
+        "tags": [
+          "绝区零",
+          "先导片拆解",
+          "镜头语言",
+          "游戏PV",
+          "剪辑节奏",
+          "分镜",
+          "视频教程"
+        ],
+        "category": "绝区零"
+      },
+      "targetPlatforms": [
+        "bilibili"
+      ],
+      "sourceRef": {
+        "themesFile": "data/scripts/demo-video-2/theme_20261024_001/themes.json",
+        "themeId": "theme_20261024_001"
+      },
+      "coverPortrait": null,
+      "runId": "demo-video-2",
+      "renderDir": "workspace/demo-video-2/render/attempt-1",
+      "publish": {
+        "status": "manual_fallback",
+        "url": null,
+        "platformVideoId": null,
+        "publishId": "pub_20261024_bilibili_theme_20261024_001_u00v-yw02",
+        "error": {
+          "code": "PUBLISH_DISABLED",
+          "message": "预检通过，但未启用真实投稿（OPC_PUBLISH_ENABLED≠1）：本次未上传、未提交"
+        },
+        "precheck": {
+          "passed": true,
+          "checks": [
+            {
+              "name": "duration",
+              "passed": true,
+              "detail": "45s / 上限 600s"
+            },
+            {
+              "name": "fileSize",
+              "passed": true,
+              "detail": "1.0MB / 上限 8192MB"
+            },
+            {
+              "name": "resolution",
+              "passed": true,
+              "detail": "1920x1080"
+            },
+            {
+              "name": "titleLength",
+              "passed": true,
+              "detail": "26/80"
+            },
+            {
+              "name": "tagCount",
+              "passed": true,
+              "detail": "7/10"
+            },
+            {
+              "name": "sensitiveWords",
+              "passed": true,
+              "detail": "未命中"
+            },
+            {
+              "name": "coverExists",
+              "passed": true,
+              "detail": "data/productions/prod_20261024_theme_20261024_001_demo-video-2/cover.jpg"
+            }
+          ]
+        }
+      },
+      "videoExists": true,
+      "coverExists": true,
+      "coverPortraitExists": false
+    },
+    {
+      "schemaVersion": 1,
+      "productionId": "prod_20261024_theme_20261024_001_demo-video-1",
+      "themeId": "theme_20261024_001",
+      "createdAt": "2026-10-24T09:47:26.015Z",
+      "renderer": "remotion",
+      "template": "remotion/explainer-30s",
+      "video": {
+        "path": "data/productions/prod_20261024_theme_20261024_001_demo-video-1/final.mp4",
+        "durationSec": 45,
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "sizeBytes": 994660,
+        "codec": "h264",
+        "sha256": "2bc844b2319c1c169da970e1ceb98ce1db4187c6e57c06d466ee89ced5535162"
+      },
+      "cover": {
+        "path": "data/productions/prod_20261024_theme_20261024_001_demo-video-1/cover.jpg",
+        "width": 1920,
+        "height": 1080
+      },
+      "script": {
+        "path": "data/scripts/demo-video-1/theme_20261024_001/script.md",
+        "storyboardPath": "data/productions/prod_20261024_theme_20261024_001_demo-video-1/storyboard.json"
+      },
+      "metadataDraft": {
+        "title": "3个镜头套路：绝区零先导片为什么这么燃",
+        "description": "45秒逐段拆解《绝区零》先导片的剪辑节奏与镜头语言，只讲普通人能立刻用上的3个套路：快切留白、景别反差、声音抢先。看完你也能拍出同款「燃」。",
+        "tags": [
+          "绝区零",
+          "先导片拆解",
+          "镜头语言",
+          "游戏PV",
+          "剪辑节奏",
+          "涨知识"
+        ],
+        "category": "绝区零"
+      },
+      "targetPlatforms": [
+        "bilibili"
+      ],
+      "sourceRef": {
+        "themesFile": "data/scripts/demo-video-1/theme_20261024_001/themes.json",
+        "themeId": "theme_20261024_001"
+      },
+      "coverPortrait": null,
+      "runId": "demo-video-1",
+      "renderDir": "workspace/demo-video-1/render/attempt-1",
+      "publish": {
+        "status": "failed",
+        "url": null,
+        "platformVideoId": null,
+        "publishId": "pub_20261024_bilibili_theme_20261024_001_u00v-trwc",
+        "error": {
+          "code": "UNKNOWN",
+          "message": "发布未启用：需要 OPC_PUBLISH_ENABLED=1 才会真实投稿（本地调试与联调请保持未设置）"
+        },
+        "precheck": {
+          "passed": true,
+          "checks": [
+            {
+              "name": "duration",
+              "passed": true,
+              "detail": "45s / 上限 600s"
+            },
+            {
+              "name": "fileSize",
+              "passed": true,
+              "detail": "0.9MB / 上限 8192MB"
+            },
+            {
+              "name": "resolution",
+              "passed": true,
+              "detail": "1920x1080"
+            },
+            {
+              "name": "titleLength",
+              "passed": true,
+              "detail": "19/80"
+            },
+            {
+              "name": "tagCount",
+              "passed": true,
+              "detail": "6/10"
+            },
+            {
+              "name": "sensitiveWords",
+              "passed": true,
+              "detail": "未命中"
+            },
+            {
+              "name": "coverExists",
+              "passed": true,
+              "detail": "data/productions/prod_20261024_theme_20261024_001_demo-video-1/cover.jpg"
+            }
+          ]
+        }
+      },
+      "videoExists": true,
+      "coverExists": true,
+      "coverPortraitExists": false
+    }
+  ]
+}

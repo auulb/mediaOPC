@@ -1,0 +1,813 @@
+{
+  "files": [
+    {
+      "path": "data/themes/latest.json",
+      "label": "当前选题",
+      "generatedAt": "2026-10-24T09:37:06.491Z",
+      "count": 6
+    },
+    {
+      "path": "workspace/real-trends-2/recommend/attempt-1/output.json",
+      "label": "选题 · real-trends-2",
+      "generatedAt": "2026-10-24T09:37:06.491Z",
+      "count": 6
+    },
+    {
+      "path": "workspace/demo-trends-1/recommend/attempt-1/output.json",
+      "label": "选题 · demo-trends-1",
+      "generatedAt": "2026-10-24T09:46:30.000Z",
+      "count": 6
+    }
+  ],
+  "primaryPath": "data/themes/latest.json",
+  "themes": [
+    {
+      "id": "theme_20261024_001",
+      "title": "《绝区零》先导片拆解：2分32秒里藏了几个镜头语言",
+      "source": "external",
+      "confidence": 0.88,
+      "reason": "手机游戏话题热度 100 位列榜首，对应《绝区零》先导片 232 万播放、互动率 0.3755 且 velocity 为 rising，是当前最强的视觉类热点。",
+      "evidence": [
+        {
+          "pointer": "/externalTrends/topTopics/0",
+          "note": "手机游戏 heat 100，排名第 1"
+        },
+        {
+          "pointer": "/externalTrends/topItems/0",
+          "note": "2322068 播放 / 互动率 0.3755 / rising"
+        }
+      ],
+      "targetPlatform": [
+        "bilibili"
+      ],
+      "brief": {
+        "angle": "用逐帧节奏拆解先导片如何用 3 个镜头把角色气场立住，AI 复刻同款运镜。",
+        "audience": "二次元手游玩家与短视频剪辑爱好者",
+        "durationSec": 45,
+        "keywords": [
+          "绝区零",
+          "先导片拆解",
+          "镜头语言",
+          "运镜",
+          "手游PV"
+        ]
+      },
+      "estimatedCost": {
+        "tokens": 45000,
+        "time": "1.5小时",
+        "budget": "$8"
+      },
+      "creationPlan": {
+        "steps": [
+          {
+            "step": "script",
+            "tool": "pi",
+            "duration": "15分钟"
+          },
+          {
+            "step": "storyboard",
+            "tool": "pi",
+            "duration": "20分钟"
+          },
+          {
+            "step": "render",
+            "tool": "remotion",
+            "duration": "25分钟"
+          }
+        ]
+      },
+      "themesFile": "data/themes/latest.json",
+      "usage": {
+        "productions": 4,
+        "published": false,
+        "last": {
+          "productionId": "prod_20261024_theme_20261024_001_demo-video-1",
+          "runId": "demo-video-1",
+          "createdAt": "2026-10-24T09:47:26.015Z"
+        }
+      }
+    },
+    {
+      "id": "theme_20261024_002",
+      "title": "拉斯维加斯自驾实拍 vs 赛博夜之城：AI 怎么还原脏霓虹",
+      "source": "external",
+      "confidence": 0.63,
+      "reason": "出行话题热度 58、对应视频 134 万播放，但互动率仅 0.0561，说明题材有量而表达偏平，适合用 AI 视觉反差重做。",
+      "evidence": [
+        {
+          "pointer": "/externalTrends/topTopics/1",
+          "note": "出行 heat 58，排名第 2"
+        },
+        {
+          "pointer": "/externalTrends/topItems/1",
+          "note": "1345786 播放，互动率 0.0561，stable"
+        }
+      ],
+      "targetPlatform": [
+        "bilibili",
+        "youtube"
+      ],
+      "brief": {
+        "angle": "同一段夜街实拍，用 AI 逐层叠上霓虹、雾气和广告牌，做出「现实夜之城」的对照感。",
+        "audience": "赛博朋克视觉爱好者与旅行影像创作者",
+        "durationSec": 60,
+        "keywords": [
+          "赛博朋克",
+          "夜之城",
+          "拉斯维加斯",
+          "AI 转绘",
+          "实拍对照"
+        ]
+      },
+      "estimatedCost": {
+        "tokens": 60000,
+        "time": "2小时",
+        "budget": "$12"
+      },
+      "creationPlan": {
+        "steps": [
+          {
+            "step": "script",
+            "tool": "pi",
+            "duration": "20分钟"
+          },
+          {
+            "step": "storyboard",
+            "tool": "pi",
+            "duration": "25分钟"
+          },
+          {
+            "step": "render",
+            "tool": "remotion",
+            "duration": "40分钟"
+          }
+        ]
+      },
+      "themesFile": "data/themes/latest.json",
+      "usage": {
+        "productions": 0,
+        "published": false,
+        "last": null
+      }
+    },
+    {
+      "id": "theme_20261024_003",
+      "title": "《纯阳真气》为什么好笑：3 个节奏点逐秒复刻",
+      "source": "external",
+      "confidence": 0.5,
+      "reason": "搞笑话题热度 24.9、视频 57.8 万播放、互动率 0.099，热度偏低但互动质量高于出行题材，适合做低成本快剪试水。",
+      "evidence": [
+        {
+          "pointer": "/externalTrends/topTopics/2",
+          "note": "搞笑 heat 24.9，排名第 3"
+        },
+        {
+          "pointer": "/externalTrends/topItems/2",
+          "note": "577891 播放，互动率 0.099"
+        }
+      ],
+      "targetPlatform": [
+        "bilibili",
+        "douyin"
+      ],
+      "brief": {
+        "angle": "把喜剧短片拆成「铺垫—错位—收尾」三拍，用 AI 动画重演同样的节奏。",
+        "audience": "喜欢短平快喜剧的年轻用户",
+        "durationSec": 30,
+        "keywords": [
+          "纯阳真气",
+          "喜剧节奏",
+          "三拍结构",
+          "AI 动画",
+          "搞笑拆解"
+        ]
+      },
+      "estimatedCost": {
+        "tokens": 25000,
+        "time": "1小时",
+        "budget": "$5"
+      },
+      "creationPlan": {
+        "steps": [
+          {
+            "step": "script",
+            "tool": "pi",
+            "duration": "10分钟"
+          },
+          {
+            "step": "storyboard",
+            "tool": "pi",
+            "duration": "15分钟"
+          },
+          {
+            "step": "render",
+            "tool": "remotion",
+            "duration": "20分钟"
+          }
+        ]
+      },
+      "themesFile": "data/themes/latest.json",
+      "usage": {
+        "productions": 2,
+        "published": false,
+        "last": {
+          "productionId": "prod_20261024_theme_20261024_003_create-video-20261024-180905",
+          "runId": "create-video-20261024-180905",
+          "createdAt": "2026-10-24T10:09:51.367Z"
+        }
+      }
+    },
+    {
+      "id": "theme_20261024_004",
+      "title": "555 万播放的 AI 动画揭秘，第二集讲分镜怎么落地",
+      "source": "internal",
+      "confidence": 0.85,
+      "reason": "《30秒看懂 AI 动画》已拿 555 万播放、互动率 0.0942 且为 topPerformer，是同题材里被验证过的结构，直接做续集风险最低。",
+      "evidence": [
+        {
+          "pointer": "/internalPerformance/episodes/0",
+          "note": "5553126 播放 / 277343 点赞 / 互动率 0.0942"
+        },
+        {
+          "pointer": "/internalPerformance",
+          "note": "avgEngagement 0.0942，topPerformers 含 pub_20240115_bili_001"
+        }
+      ],
+      "targetPlatform": [
+        "bilibili",
+        "youtube"
+      ],
+      "brief": {
+        "angle": "延续「30 秒看懂」的节奏，这次只回答一个问题：一句 prompt 到能渲染的分镜，中间发生了什么。",
+        "audience": "想入门 AI 动画的创作者与运营",
+        "durationSec": 60,
+        "keywords": [
+          "AI 动画",
+          "分镜",
+          "prompt",
+          "制作流程",
+          "系列续集"
+        ]
+      },
+      "estimatedCost": {
+        "tokens": 50000,
+        "time": "2小时",
+        "budget": "$10"
+      },
+      "creationPlan": {
+        "steps": [
+          {
+            "step": "script",
+            "tool": "pi",
+            "duration": "20分钟"
+          },
+          {
+            "step": "storyboard",
+            "tool": "pi",
+            "duration": "25分钟"
+          },
+          {
+            "step": "render",
+            "tool": "remotion",
+            "duration": "35分钟"
+          }
+        ]
+      },
+      "themesFile": "data/themes/latest.json",
+      "usage": {
+        "productions": 0,
+        "published": false,
+        "last": null
+      }
+    },
+    {
+      "id": "theme_20261024_005",
+      "title": "Token 烧到预算 147%，我怎么把 AI 动画成本砍下来",
+      "source": "internal",
+      "confidence": 0.68,
+      "reason": "本周 token 用量 738776 已达预算 500000 的 147.76%，其中 publish-bilibili 单步占 514381，成本失控本身就是一个高共鸣选题。",
+      "evidence": [
+        {
+          "pointer": "/tokenUsage",
+          "note": "today 738776 / budget 500000 / utilizationRate 1.4776"
+        },
+        {
+          "pointer": "/tokenUsage/byStep/0",
+          "note": "publish-bilibili 单步消耗 514381 tokens"
+        },
+        {
+          "pointer": "/internalPerformance/episodes/0",
+          "note": "同题材已有 555 万播放，方法论内容有受众基础"
+        }
+      ],
+      "targetPlatform": [
+        "bilibili"
+      ],
+      "brief": {
+        "angle": "把超支的账单摊开：哪一步在偷偷烧 token，以及三个立刻见效的降本改法。",
+        "audience": "用 AI 做内容的小团队与独立创作者",
+        "durationSec": 50,
+        "keywords": [
+          "token 成本",
+          "AI 动画",
+          "降本",
+          "预算",
+          "工作流复盘"
+        ]
+      },
+      "estimatedCost": {
+        "tokens": 30000,
+        "time": "1.5小时",
+        "budget": "$6"
+      },
+      "creationPlan": {
+        "steps": [
+          {
+            "step": "script",
+            "tool": "pi",
+            "duration": "15分钟"
+          },
+          {
+            "step": "storyboard",
+            "tool": "pi",
+            "duration": "15分钟"
+          },
+          {
+            "step": "render",
+            "tool": "remotion",
+            "duration": "25分钟"
+          }
+        ]
+      },
+      "themesFile": "data/themes/latest.json",
+      "usage": {
+        "productions": 0,
+        "published": false,
+        "last": null
+      }
+    },
+    {
+      "id": "theme_20261024_006",
+      "title": "9 次成功 0 失败：一条 AI 视频流水线的日更实录",
+      "source": "internal",
+      "confidence": 0.56,
+      "reason": "任务面板累计 9 成功 0 失败、仅 1 个运行中 1 个待处理，稳定性是可讲的故事，也比纯教程更容易建立信任。",
+      "evidence": [
+        {
+          "pointer": "/taskStatus/summary",
+          "note": "success 9 / failed 0 / running 1 / pending 1"
+        },
+        {
+          "pointer": "/taskStatus/recent/0",
+          "note": "当前 recommend 步骤处于 pending，正好是流水线的实例"
+        }
+      ],
+      "targetPlatform": [
+        "bilibili",
+        "douyin"
+      ],
+      "brief": {
+        "angle": "用一天的真实跑批记录，展示从抓热点到出片每一步谁在干活、错在哪被挡住。",
+        "audience": "对自动化内容生产好奇的从业者",
+        "durationSec": 40,
+        "keywords": [
+          "AI 流水线",
+          "自动化",
+          "日更",
+          "工作流",
+          "幕后"
+        ]
+      },
+      "estimatedCost": {
+        "tokens": 28000,
+        "time": "1小时",
+        "budget": "$5"
+      },
+      "creationPlan": {
+        "steps": [
+          {
+            "step": "script",
+            "tool": "pi",
+            "duration": "10分钟"
+          },
+          {
+            "step": "storyboard",
+            "tool": "pi",
+            "duration": "15分钟"
+          },
+          {
+            "step": "render",
+            "tool": "remotion",
+            "duration": "20分钟"
+          }
+        ]
+      },
+      "themesFile": "data/themes/latest.json",
+      "usage": {
+        "productions": 0,
+        "published": false,
+        "last": null
+      }
+    }
+  ],
+  "recommendations": {
+    "external": [
+      {
+        "id": "theme_20261024_001",
+        "title": "《绝区零》先导片拆解：2分32秒里藏了几个镜头语言",
+        "source": "external",
+        "confidence": 0.88,
+        "reason": "手机游戏话题热度 100 位列榜首，对应《绝区零》先导片 232 万播放、互动率 0.3755 且 velocity 为 rising，是当前最强的视觉类热点。",
+        "evidence": [
+          {
+            "pointer": "/externalTrends/topTopics/0",
+            "note": "手机游戏 heat 100，排名第 1"
+          },
+          {
+            "pointer": "/externalTrends/topItems/0",
+            "note": "2322068 播放 / 互动率 0.3755 / rising"
+          }
+        ],
+        "targetPlatform": [
+          "bilibili"
+        ],
+        "brief": {
+          "angle": "用逐帧节奏拆解先导片如何用 3 个镜头把角色气场立住，AI 复刻同款运镜。",
+          "audience": "二次元手游玩家与短视频剪辑爱好者",
+          "durationSec": 45,
+          "keywords": [
+            "绝区零",
+            "先导片拆解",
+            "镜头语言",
+            "运镜",
+            "手游PV"
+          ]
+        },
+        "estimatedCost": {
+          "tokens": 45000,
+          "time": "1.5小时",
+          "budget": "$8"
+        },
+        "creationPlan": {
+          "steps": [
+            {
+              "step": "script",
+              "tool": "pi",
+              "duration": "15分钟"
+            },
+            {
+              "step": "storyboard",
+              "tool": "pi",
+              "duration": "20分钟"
+            },
+            {
+              "step": "render",
+              "tool": "remotion",
+              "duration": "25分钟"
+            }
+          ]
+        },
+        "themesFile": "data/themes/latest.json",
+        "usage": {
+          "productions": 4,
+          "published": false,
+          "last": {
+            "productionId": "prod_20261024_theme_20261024_001_demo-video-1",
+            "runId": "demo-video-1",
+            "createdAt": "2026-10-24T09:47:26.015Z"
+          }
+        }
+      },
+      {
+        "id": "theme_20261024_002",
+        "title": "拉斯维加斯自驾实拍 vs 赛博夜之城：AI 怎么还原脏霓虹",
+        "source": "external",
+        "confidence": 0.63,
+        "reason": "出行话题热度 58、对应视频 134 万播放，但互动率仅 0.0561，说明题材有量而表达偏平，适合用 AI 视觉反差重做。",
+        "evidence": [
+          {
+            "pointer": "/externalTrends/topTopics/1",
+            "note": "出行 heat 58，排名第 2"
+          },
+          {
+            "pointer": "/externalTrends/topItems/1",
+            "note": "1345786 播放，互动率 0.0561，stable"
+          }
+        ],
+        "targetPlatform": [
+          "bilibili",
+          "youtube"
+        ],
+        "brief": {
+          "angle": "同一段夜街实拍，用 AI 逐层叠上霓虹、雾气和广告牌，做出「现实夜之城」的对照感。",
+          "audience": "赛博朋克视觉爱好者与旅行影像创作者",
+          "durationSec": 60,
+          "keywords": [
+            "赛博朋克",
+            "夜之城",
+            "拉斯维加斯",
+            "AI 转绘",
+            "实拍对照"
+          ]
+        },
+        "estimatedCost": {
+          "tokens": 60000,
+          "time": "2小时",
+          "budget": "$12"
+        },
+        "creationPlan": {
+          "steps": [
+            {
+              "step": "script",
+              "tool": "pi",
+              "duration": "20分钟"
+            },
+            {
+              "step": "storyboard",
+              "tool": "pi",
+              "duration": "25分钟"
+            },
+            {
+              "step": "render",
+              "tool": "remotion",
+              "duration": "40分钟"
+            }
+          ]
+        },
+        "themesFile": "data/themes/latest.json",
+        "usage": {
+          "productions": 0,
+          "published": false,
+          "last": null
+        }
+      },
+      {
+        "id": "theme_20261024_003",
+        "title": "《纯阳真气》为什么好笑：3 个节奏点逐秒复刻",
+        "source": "external",
+        "confidence": 0.5,
+        "reason": "搞笑话题热度 24.9、视频 57.8 万播放、互动率 0.099，热度偏低但互动质量高于出行题材，适合做低成本快剪试水。",
+        "evidence": [
+          {
+            "pointer": "/externalTrends/topTopics/2",
+            "note": "搞笑 heat 24.9，排名第 3"
+          },
+          {
+            "pointer": "/externalTrends/topItems/2",
+            "note": "577891 播放，互动率 0.099"
+          }
+        ],
+        "targetPlatform": [
+          "bilibili",
+          "douyin"
+        ],
+        "brief": {
+          "angle": "把喜剧短片拆成「铺垫—错位—收尾」三拍，用 AI 动画重演同样的节奏。",
+          "audience": "喜欢短平快喜剧的年轻用户",
+          "durationSec": 30,
+          "keywords": [
+            "纯阳真气",
+            "喜剧节奏",
+            "三拍结构",
+            "AI 动画",
+            "搞笑拆解"
+          ]
+        },
+        "estimatedCost": {
+          "tokens": 25000,
+          "time": "1小时",
+          "budget": "$5"
+        },
+        "creationPlan": {
+          "steps": [
+            {
+              "step": "script",
+              "tool": "pi",
+              "duration": "10分钟"
+            },
+            {
+              "step": "storyboard",
+              "tool": "pi",
+              "duration": "15分钟"
+            },
+            {
+              "step": "render",
+              "tool": "remotion",
+              "duration": "20分钟"
+            }
+          ]
+        },
+        "themesFile": "data/themes/latest.json",
+        "usage": {
+          "productions": 2,
+          "published": false,
+          "last": {
+            "productionId": "prod_20261024_theme_20261024_003_create-video-20261024-180905",
+            "runId": "create-video-20261024-180905",
+            "createdAt": "2026-10-24T10:09:51.367Z"
+          }
+        }
+      }
+    ],
+    "internal": [
+      {
+        "id": "theme_20261024_004",
+        "title": "555 万播放的 AI 动画揭秘，第二集讲分镜怎么落地",
+        "source": "internal",
+        "confidence": 0.85,
+        "reason": "《30秒看懂 AI 动画》已拿 555 万播放、互动率 0.0942 且为 topPerformer，是同题材里被验证过的结构，直接做续集风险最低。",
+        "evidence": [
+          {
+            "pointer": "/internalPerformance/episodes/0",
+            "note": "5553126 播放 / 277343 点赞 / 互动率 0.0942"
+          },
+          {
+            "pointer": "/internalPerformance",
+            "note": "avgEngagement 0.0942，topPerformers 含 pub_20240115_bili_001"
+          }
+        ],
+        "targetPlatform": [
+          "bilibili",
+          "youtube"
+        ],
+        "brief": {
+          "angle": "延续「30 秒看懂」的节奏，这次只回答一个问题：一句 prompt 到能渲染的分镜，中间发生了什么。",
+          "audience": "想入门 AI 动画的创作者与运营",
+          "durationSec": 60,
+          "keywords": [
+            "AI 动画",
+            "分镜",
+            "prompt",
+            "制作流程",
+            "系列续集"
+          ]
+        },
+        "estimatedCost": {
+          "tokens": 50000,
+          "time": "2小时",
+          "budget": "$10"
+        },
+        "creationPlan": {
+          "steps": [
+            {
+              "step": "script",
+              "tool": "pi",
+              "duration": "20分钟"
+            },
+            {
+              "step": "storyboard",
+              "tool": "pi",
+              "duration": "25分钟"
+            },
+            {
+              "step": "render",
+              "tool": "remotion",
+              "duration": "35分钟"
+            }
+          ]
+        },
+        "themesFile": "data/themes/latest.json",
+        "usage": {
+          "productions": 0,
+          "published": false,
+          "last": null
+        }
+      },
+      {
+        "id": "theme_20261024_005",
+        "title": "Token 烧到预算 147%，我怎么把 AI 动画成本砍下来",
+        "source": "internal",
+        "confidence": 0.68,
+        "reason": "本周 token 用量 738776 已达预算 500000 的 147.76%，其中 publish-bilibili 单步占 514381，成本失控本身就是一个高共鸣选题。",
+        "evidence": [
+          {
+            "pointer": "/tokenUsage",
+            "note": "today 738776 / budget 500000 / utilizationRate 1.4776"
+          },
+          {
+            "pointer": "/tokenUsage/byStep/0",
+            "note": "publish-bilibili 单步消耗 514381 tokens"
+          },
+          {
+            "pointer": "/internalPerformance/episodes/0",
+            "note": "同题材已有 555 万播放，方法论内容有受众基础"
+          }
+        ],
+        "targetPlatform": [
+          "bilibili"
+        ],
+        "brief": {
+          "angle": "把超支的账单摊开：哪一步在偷偷烧 token，以及三个立刻见效的降本改法。",
+          "audience": "用 AI 做内容的小团队与独立创作者",
+          "durationSec": 50,
+          "keywords": [
+            "token 成本",
+            "AI 动画",
+            "降本",
+            "预算",
+            "工作流复盘"
+          ]
+        },
+        "estimatedCost": {
+          "tokens": 30000,
+          "time": "1.5小时",
+          "budget": "$6"
+        },
+        "creationPlan": {
+          "steps": [
+            {
+              "step": "script",
+              "tool": "pi",
+              "duration": "15分钟"
+            },
+            {
+              "step": "storyboard",
+              "tool": "pi",
+              "duration": "15分钟"
+            },
+            {
+              "step": "render",
+              "tool": "remotion",
+              "duration": "25分钟"
+            }
+          ]
+        },
+        "themesFile": "data/themes/latest.json",
+        "usage": {
+          "productions": 0,
+          "published": false,
+          "last": null
+        }
+      },
+      {
+        "id": "theme_20261024_006",
+        "title": "9 次成功 0 失败：一条 AI 视频流水线的日更实录",
+        "source": "internal",
+        "confidence": 0.56,
+        "reason": "任务面板累计 9 成功 0 失败、仅 1 个运行中 1 个待处理，稳定性是可讲的故事，也比纯教程更容易建立信任。",
+        "evidence": [
+          {
+            "pointer": "/taskStatus/summary",
+            "note": "success 9 / failed 0 / running 1 / pending 1"
+          },
+          {
+            "pointer": "/taskStatus/recent/0",
+            "note": "当前 recommend 步骤处于 pending，正好是流水线的实例"
+          }
+        ],
+        "targetPlatform": [
+          "bilibili",
+          "douyin"
+        ],
+        "brief": {
+          "angle": "用一天的真实跑批记录，展示从抓热点到出片每一步谁在干活、错在哪被挡住。",
+          "audience": "对自动化内容生产好奇的从业者",
+          "durationSec": 40,
+          "keywords": [
+            "AI 流水线",
+            "自动化",
+            "日更",
+            "工作流",
+            "幕后"
+          ]
+        },
+        "estimatedCost": {
+          "tokens": 28000,
+          "time": "1小时",
+          "budget": "$5"
+        },
+        "creationPlan": {
+          "steps": [
+            {
+              "step": "script",
+              "tool": "pi",
+              "duration": "10分钟"
+            },
+            {
+              "step": "storyboard",
+              "tool": "pi",
+              "duration": "15分钟"
+            },
+            {
+              "step": "render",
+              "tool": "remotion",
+              "duration": "20分钟"
+            }
+          ]
+        },
+        "themesFile": "data/themes/latest.json",
+        "usage": {
+          "productions": 0,
+          "published": false,
+          "last": null
+        }
+      }
+    ]
+  },
+  "counts": {
+    "total": 6,
+    "external": 3,
+    "internal": 3,
+    "published": 0
+  }
+}
