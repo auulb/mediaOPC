@@ -1,6 +1,7 @@
 import React from 'react';
 import { Composition } from 'remotion';
 import { Explainer30s, explainerDefaults, type ExplainerProps } from './Explainer30s';
+import { CoverPortrait, coverPortraitDefaults, type CoverPortraitProps } from './CoverPortrait';
 
 const FPS = 30;
 
@@ -13,14 +14,26 @@ const calcMeta = ({ props }: { props: ExplainerProps }) => ({
 });
 
 export const Root: React.FC = () => (
-  <Composition
-    id="explainer-30s"
-    component={Explainer30s}
-    fps={FPS}
-    width={1920}
-    height={1080}
-    durationInFrames={30 * FPS}
-    defaultProps={explainerDefaults}
-    calculateMetadata={calcMeta}
-  />
+  <>
+    <Composition
+      id="explainer-30s"
+      component={Explainer30s}
+      fps={FPS}
+      width={1920}
+      height={1080}
+      durationInFrames={30 * FPS}
+      defaultProps={explainerDefaults}
+      calculateMetadata={calcMeta}
+    />
+    {/* 竖版封面：静态图，1 帧即可 */}
+    <Composition
+      id="cover-portrait"
+      component={CoverPortrait}
+      fps={FPS}
+      width={1080}
+      height={1920}
+      durationInFrames={1}
+      defaultProps={coverPortraitDefaults}
+    />
+  </>
 );

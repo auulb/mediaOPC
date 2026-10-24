@@ -8,3 +8,6 @@ dashboard/task_status.json
 .webui.pid
 .playwright-mcp/
 p*.md
+
+# 静态站点构建产物（发布到 gh-pages / Vercel）
+webui/dist/

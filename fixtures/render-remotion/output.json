@@ -26,12 +26,25 @@
   "metadataDraft": {
     "title": "30秒看懂：AI 动画是怎么做出来的",
     "description": "从脚本到分镜到渲染，一条 AI 动画的完整生产链路。",
-    "tags": ["AI", "动画", "教程", "Remotion"],
+    "tags": [
+      "AI",
+      "动画",
+      "教程",
+      "Remotion"
+    ],
     "category": "科技"
   },
-  "targetPlatforms": ["bilibili", "youtube"],
+  "targetPlatforms": [
+    "bilibili",
+    "youtube"
+  ],
   "sourceRef": {
     "themesFile": "fixtures/recommend-themes/output.json",
     "themeId": "theme_001"
+  },
+  "coverPortrait": {
+    "path": "data/productions/prod_fixture/cover-portrait.jpg",
+    "width": 1080,
+    "height": 1920
   }
 }

@@ -213,3 +213,17 @@
   2. 若生产要用网页触发真发布，daemon 侧同样需要导出 `OPC_PUBLISH_ENABLED`
   3. `DURATION_MISMATCH`、`PUBLISH_DISABLED` 等新增 error code 请同步进 A 的错误码文档
 - 文档：`docs/使用教程.md` 新增第 0 节（网页点按钮），`webui/README.md` 说明 API 与安全边界
+
+## M4 Web 制作台改版：五段式界面 + 人工确认 + 竖版封面（2026-10-24，C 侧）
+- `webui/` 由「一个运行控制台」改成五个页签：数据接口 / 数据看板 / 选题引擎 / 创作引擎 / 发布引擎（hash 深链 #sources #dashboard #topics #create #publish）
+- 新增 API：`/api/data`（看板+原始样本+博主聚合+定时计划）、`/api/topics`（外部3+内部3+主题库使用状态）、`/api/productions`、`/api/create/draft|script|render`、`/api/publish`
+- 创作引擎改为三段式：写稿（run-step）→ 人工确认（口播稿/标题/简介/标签/分镜可改，5 秒倒计时自动下一步，输入即暂停）→ 渲染；改动写 `workspace/<runId>/edit/`，不覆盖原始 step 产物
+- 渲染新增竖版封面 9:16（Remotion composition `cover-portrait`）：`data/productions/<id>/cover-portrait.jpg`，production 契约新增**可选**字段 `coverPortrait`（向后兼容，旧 fixture 仍通过）
+- 发布引擎：成片列表 + 7 项预检可视化 + 投稿信息编辑 + 发布历史；「只跑预检」永不注入 `OPC_PUBLISH_ENABLED`（显式置空，防继承）
+- 实测：UI 内 theme_20261024_003 → 写稿 → 5 秒自动渲染 → `prod_..._create-20261024-211127`（30s / 1920x1080 / 635KB / 双封面）→ 预检 7/7 通过 → `manual_fallback + PUBLISH_DISABLED`
+- 测试：`node --test webui/test/api.test.mjs` 13/13；`npm test` 85/85 不变
+- 需要 B：
+  1. 抖音 adapter 与「同赛道博主榜」——现在 数据接口/看板 明确显示为缺口，只有 B 站 Top3 样本
+  2. `fetch-bilibili` 的 limit 可从 3 提到 10+，否则博主维度样本太薄
+- 需要 A：`webui/test/*.test.mjs` 进根 test glob（+13 条）；`schedule.yaml` 目前全 disabled，看板已展示
+- 仍未做：B 站封面上传（只准备横/竖两张图，投稿页封面仍由平台自动截帧）；真实投稿仍需人工扫码验证

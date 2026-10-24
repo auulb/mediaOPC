@@ -6,85 +6,224 @@
   "x-version": 1,
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "productionId", "themeId", "createdAt", "renderer", "video", "cover", "metadataDraft", "targetPlatforms", "sourceRef"],
+  "required": [
+    "schemaVersion",
+    "productionId",
+    "themeId",
+    "createdAt",
+    "renderer",
+    "video",
+    "cover",
+    "metadataDraft",
+    "targetPlatforms",
+    "sourceRef"
+  ],
   "properties": {
-    "schemaVersion": { "const": 1 },
-    "productionId": { "type": "string", "pattern": "^prod_[A-Za-z0-9_-]+$" },
-    "themeId": { "type": "string", "minLength": 1, "description": "对应 themes.schema.json 中 themes[].id" },
-    "createdAt": { "type": "string", "format": "date-time" },
-    "renderer": { "enum": ["remotion", "hyperframes", "hypit", "ffmpeg"] },
-    "template": { "type": "string", "description": "渲染模板 ID，如 remotion/explainer-30s" },
+    "schemaVersion": {
+      "const": 1
+    },
+    "productionId": {
+      "type": "string",
+      "pattern": "^prod_[A-Za-z0-9_-]+$"
+    },
+    "themeId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "对应 themes.schema.json 中 themes[].id"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "renderer": {
+      "enum": [
+        "remotion",
+        "hyperframes",
+        "hypit",
+        "ffmpeg"
+      ]
+    },
+    "template": {
+      "type": "string",
+      "description": "渲染模板 ID，如 remotion/explainer-30s"
+    },
     "video": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "durationSec", "width", "height", "fps", "sizeBytes"],
+      "required": [
+        "path",
+        "durationSec",
+        "width",
+        "height",
+        "fps",
+        "sizeBytes"
+      ],
       "properties": {
-        "path": { "$ref": "#/$defs/relPath" },
-        "durationSec": { "type": "number", "exclusiveMinimum": 0 },
-        "width": { "type": "integer", "minimum": 1 },
-        "height": { "type": "integer", "minimum": 1 },
-        "fps": { "type": "number", "exclusiveMinimum": 0 },
-        "sizeBytes": { "type": "integer", "minimum": 1 },
-        "codec": { "type": "string" },
-        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        "path": {
+          "$ref": "#/$defs/relPath"
+        },
+        "durationSec": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "fps": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "codec": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
       }
     },
     "cover": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "width", "height"],
+      "required": [
+        "path",
+        "width",
+        "height"
+      ],
       "properties": {
-        "path": { "$ref": "#/$defs/relPath" },
-        "width": { "type": "integer", "minimum": 1 },
-        "height": { "type": "integer", "minimum": 1 }
+        "path": {
+          "$ref": "#/$defs/relPath"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
+    },
+    "coverPortrait": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relPath"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "description": "竖版封面（9:16，抖音/视频号等），可选；横版见 cover"
     },
     "script": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path"],
+      "required": [
+        "path"
+      ],
       "properties": {
-        "path": { "$ref": "#/$defs/relPath" },
-        "storyboardPath": { "$ref": "#/$defs/relPath" }
+        "path": {
+          "$ref": "#/$defs/relPath"
+        },
+        "storyboardPath": {
+          "$ref": "#/$defs/relPath"
+        }
       }
     },
     "metadataDraft": {
       "description": "标题/描述/标签草稿，发布步骤可按平台规则再裁剪",
       "type": "object",
       "additionalProperties": false,
-      "required": ["title", "description", "tags"],
+      "required": [
+        "title",
+        "description",
+        "tags"
+      ],
       "properties": {
-        "title": { "type": "string", "minLength": 1, "maxLength": 80 },
-        "description": { "type": "string", "maxLength": 2000 },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000
+        },
         "tags": {
           "type": "array",
           "minItems": 1,
           "maxItems": 12,
           "uniqueItems": true,
-          "items": { "type": "string", "minLength": 1, "maxLength": 20 }
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20
+          }
         },
-        "category": { "type": "string" }
+        "category": {
+          "type": "string"
+        }
       }
     },
     "targetPlatforms": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/platform" }
+      "items": {
+        "$ref": "#/$defs/platform"
+      }
     },
     "sourceRef": {
       "description": "溯源：来自哪个主题文件",
       "type": "object",
       "additionalProperties": false,
-      "required": ["themesFile", "themeId"],
+      "required": [
+        "themesFile",
+        "themeId"
+      ],
       "properties": {
-        "themesFile": { "$ref": "#/$defs/relPath" },
-        "themeId": { "type": "string" }
+        "themesFile": {
+          "$ref": "#/$defs/relPath"
+        },
+        "themeId": {
+          "type": "string"
+        }
       }
     }
   },
   "$defs": {
-    "relPath": { "type": "string", "pattern": "^(?!/)(?!.*\\.\\./)[A-Za-z0-9_./-]+$" },
-    "platform": { "enum": ["bilibili", "youtube", "douyin", "tiktok"] }
+    "relPath": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*\\.\\./)[A-Za-z0-9_./-]+$"
+    },
+    "platform": {
+      "enum": [
+        "bilibili",
+        "youtube",
+        "douyin",
+        "tiktok"
+      ]
+    }
   }
 }

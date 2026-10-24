@@ -77,13 +77,29 @@ async function renderVideo({ storyboard, template, outDir }) {
     },
   });
 
-  // 封面：取第一个场景入场动画完成后的一帧
+  // 横版封面：取第一个场景入场动画完成后的一帧
   const coverPath = path.join(outDir, 'cover.jpg');
   await renderStill({
     serveUrl, composition, inputProps: storyboard,
     output: coverPath, frame: Math.min(45, composition.durationInFrames - 1), imageFormat: 'jpeg', jpegQuality: 90,
   });
-  return { videoPath, coverPath, composition };
+
+  // 竖版封面（9:16）：独立 composition，取标题/副标题/配色
+  const totalSec = storyboard.scenes.reduce((s, sc) => s + sc.durationSec, 0);
+  const portraitProps = {
+    theme: storyboard.theme,
+    kicker: 'OPC · 拆解',
+    title: storyboard.scenes[0]?.heading || '本期拆解',
+    subtitle: storyboard.scenes.find((sc) => sc.kind === 'point')?.heading || '',
+    footer: `AI 动画 · ${Math.round(totalSec)} 秒看懂`,
+  };
+  const portraitComposition = await selectComposition({ serveUrl, id: 'cover-portrait', inputProps: portraitProps });
+  const portraitPath = path.join(outDir, 'cover-portrait.jpg');
+  await renderStill({
+    serveUrl, composition: portraitComposition, inputProps: portraitProps,
+    output: portraitPath, frame: 0, imageFormat: 'jpeg', jpegQuality: 92,
+  });
+  return { videoPath, coverPath, portraitPath, portraitComposition, composition };
 }
 
 function probe(videoPath) {
@@ -122,7 +138,7 @@ async function runStep(args, v) {
     const runSuffix = safeId(process.env.OPC_RUN_ID || `${Date.now()}`);
     const productionId = `prod_${stamp()}_${input.themeId}_${runSuffix}`;
     const outDir = path.join(ROOT, 'data/productions', productionId);
-    const { videoPath, coverPath, composition } = await renderVideo({
+    const { videoPath, coverPath, portraitPath, portraitComposition, composition } = await renderVideo({
       storyboard: input.storyboard, template: input.template, outDir,
     });
     fs.writeFileSync(path.join(outDir, 'storyboard.json'), JSON.stringify(input.storyboard, null, 2) + '\n');
@@ -133,6 +149,7 @@ async function runStep(args, v) {
       renderer: 'remotion', template: input.template,
       video: { path: rel(videoPath), ...meta, sha256: sha256(videoPath) },
       cover: { path: rel(coverPath), width: composition.width, height: composition.height },
+      coverPortrait: { path: rel(portraitPath), width: portraitComposition.width, height: portraitComposition.height },
       script: {
         ...(input.script?.path ? { path: input.script.path } : { path: rel(path.join(outDir, 'storyboard.json')) }),
         storyboardPath: rel(path.join(outDir, 'storyboard.json')),
@@ -146,10 +163,11 @@ async function runStep(args, v) {
     writeOutput(production);
     fs.writeFileSync(path.join(outputDir, 'artifacts.json'), JSON.stringify([
       { path: rel(videoPath), kind: 'video', contract: 'production', description: '成片' },
-      { path: rel(coverPath), kind: 'image', description: '封面' },
+      { path: rel(coverPath), kind: 'image', description: '封面（横版 16:9）' },
+      { path: rel(portraitPath), kind: 'image', description: '封面（竖版 9:16）' },
       { path: rel(path.join(outDir, 'storyboard.json')), kind: 'json', description: '分镜' },
     ], null, 2) + '\n');
-    process.stderr.write(`[render] ok ${production.video.path} ${meta.durationSec}s ${meta.sizeBytes}B\n`);
+    process.stderr.write(`[render] ok ${production.video.path} ${meta.durationSec}s ${meta.sizeBytes}B cover=${rel(portraitPath)}\n`);
     return 0;
   } catch (e) {
     const code = e instanceof StepError ? e.code : 'RENDER_FAILED';

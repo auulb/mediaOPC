@@ -86,3 +86,50 @@ test('教程接口返回 markdown', async () => {
   assert.equal(r.status, 200);
   assert.match(await r.text(), /OPC 使用教程/);
 });
+
+test('/api/data 返回看板、数据源与博主聚合', async () => {
+  const d = await (await fetch(`${BASE}/api/data`)).json();
+  assert.ok(d.dashboard);
+  assert.ok(Array.isArray(d.sources.sources));
+  assert.ok(d.sources.sources.length >= 1);
+  assert.ok(Array.isArray(d.sources.creators));
+  assert.ok(d.sources.creators.some((c) => c.name));
+  assert.ok(Array.isArray(d.schedule));
+});
+
+test('/api/topics 给出外部 3 + 内部 3，且不混入 fixture', async () => {
+  const t = await (await fetch(`${BASE}/api/topics`)).json();
+  assert.ok(t.recommendations.external.length <= 3);
+  assert.ok(t.recommendations.internal.length <= 3);
+  assert.ok(t.themes.every((x) => !String(x.themesFile).startsWith('fixtures/')));
+  for (const x of [...t.recommendations.external, ...t.recommendations.internal]) {
+    assert.equal(x.themesFile, t.primaryPath);
+  }
+});
+
+test('/api/productions 每条都带 video 路径与横竖封面字段', async () => {
+  const d = await (await fetch(`${BASE}/api/productions`)).json();
+  assert.ok(Array.isArray(d.productions));
+  for (const p of d.productions) {
+    assert.ok(p.video?.path, p.productionId);
+    assert.ok('coverPortrait' in p);
+  }
+});
+
+test('POST /api/publish 没有成片时 404', async () => {
+  const r = await fetch(`${BASE}/api/publish`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ runId: 'no-such-run', publish: false }),
+  });
+  assert.equal(r.status, 404);
+});
+
+test('POST /api/create/render 没有稿子时 404', async () => {
+  const r = await fetch(`${BASE}/api/create/render`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ runId: 'no-such-run' }),
+  });
+  assert.equal(r.status, 404);
+});

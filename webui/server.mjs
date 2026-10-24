@@ -59,6 +59,283 @@ async function readBody(req) {
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
 }
 
+
+// ---------------------------------------------------------------- 业务视图（数据接口 / 看板 / 选题 / 成片）
+const relOf = (abs) => path.relative(ROOT, abs);
+const urlOf = (item) => item.url || (item.id && /^BV/.test(item.id) ? `https://www.bilibili.com/video/${item.id}` : null);
+
+function latestAttempt(stepDir) {
+  try {
+    const atts = fs.readdirSync(stepDir).filter((d) => /^attempt-\d+$/.test(d));
+    if (!atts.length) return null;
+    atts.sort((a, b) => Number(a.split('-')[1]) - Number(b.split('-')[1]));
+    return path.join(stepDir, atts[atts.length - 1]);
+  } catch { return null; }
+}
+
+function readStepOutput(runId, stepId) {
+  const att = latestAttempt(path.join(ROOT, 'workspace', runId, stepId));
+  if (!att) return null;
+  return {
+    dir: relOf(att),
+    output: readJson(path.join(att, 'output.json')),
+    error: readJson(path.join(att, 'error.json')),
+    envelope: readJson(path.join(att, 'envelope.json')),
+  };
+}
+
+function sourcesView() {
+  const dash = readJson(path.join(ROOT, 'dashboard/dashboard.json'));
+  const list = [];
+  for (const src of dash?.sources || []) {
+    if (src.kind !== 'raw-items') continue; // token-ledger / task-status 不是采集接口
+    const doc = readJson(safePath(src.file) || '');
+    const items = Array.isArray(doc?.items) ? doc.items : [];
+    list.push({
+      id: src.id,
+      dataSource: src.dataSource || 'unknown',
+      kind: src.kind,
+      timestamp: src.timestamp || doc?.timestamp || null,
+      file: src.file,
+      count: items.length,
+      fields: items[0] ? Object.keys(items[0]) : [],
+      items: items.map((i) => ({
+        id: i.id, title: i.title, url: urlOf(i), platform: i.platform || doc?.platform || null,
+        channel: i.channel?.name || null, views: i.views ?? null, likes: i.likes ?? null,
+        comments: i.comments ?? null, shares: i.shares ?? null, favorites: i.favorites ?? null,
+        engagement: i.metrics?.engagement ?? null, viewsPerHour: i.metrics?.viewsPerHour ?? null,
+        velocity: i.metrics?.velocity ?? null, tags: i.tags || [], category: i.category || null,
+        durationSec: i.durationSec ?? null, publishDate: i.publishDate || null,
+        internal: i.internal || null,
+      })),
+    });
+  }
+  const creators = new Map();
+  for (const src of list) {
+    const isInternal = /internal/.test(src.dataSource);
+    for (const i of src.items) {
+      if (!i.channel) continue;
+      const key = `${isInternal ? 'internal' : 'external'}:${i.channel}`;
+      const cur = creators.get(key) || { name: i.channel, internal: isInternal, items: 0, views: 0, likes: 0, engagementSum: 0, rising: 0, tags: new Set(), ids: [] };
+      cur.items += 1;
+      cur.views += i.views || 0;
+      cur.likes += i.likes || 0;
+      cur.engagementSum += i.engagement || 0;
+      if (i.velocity === 'rising') cur.rising += 1;
+      for (const t of i.tags || []) cur.tags.add(t);
+      cur.ids.push(i.id);
+      creators.set(key, cur);
+    }
+  }
+
+  const platforms = [...new Set(list.filter((x) => !/internal/.test(x.dataSource))
+    .map((x) => (x.items[0]?.platform || '').toLowerCase()).filter(Boolean))];
+  const hasCreator = list.some((x) => x.items.some((i) => i.channel));
+  return {
+    generatedAt: dash?.generatedAt || null,
+    sources: list,
+    creators: [...creators.values()].map((c) => ({
+      ...c,
+      tags: [...c.tags].slice(0, 5),
+      avgEngagement: c.items ? c.engagementSum / c.items : null,
+    })).sort((a, b) => b.views - a.views),
+    coverage: {
+      platforms,
+      hasDouyin: platforms.includes('douyin'),
+      hasCreatorMetrics: hasCreator,
+      gaps: [
+        ...(platforms.includes('douyin') ? [] : ['抖音热门 / 同赛道数据未接入（adapter 未实现）']),
+        ...(hasCreator ? [] : ['同领域优秀博主榜单未接入']),
+        '平台只返回 Top3 样本，样本量偏小（fetch-bilibili 的 limit 参数）',
+      ],
+    },
+  };
+}
+
+function dashboardView() {
+  const dash = readJson(path.join(ROOT, 'dashboard/dashboard.json'));
+  const files = ['dashboard.json', 'external_trends.json', 'internal_performance.json', 'token_usage.json', 'task_status.json']
+    .map((f) => {
+      const abs = path.join(ROOT, 'dashboard', f);
+      return { file: `dashboard/${f}`, mtime: exists(abs) ? fs.statSync(abs).mtime.toISOString() : null };
+    });
+  const budget = (() => {
+    try {
+      const y = parseYaml(readText(path.join(ROOT, 'config/token-budget.yaml')) || '') || {};
+      return y;
+    } catch { return null; }
+  })();
+  return {
+    generatedAt: dash?.generatedAt || null,
+    external: dash?.externalTrends || null,
+    internal: dash?.internalPerformance || null,
+    tokens: dash?.tokenUsage || null,
+    tasks: dash?.taskStatus || null,
+    budget,
+    files,
+  };
+}
+
+function scheduleView() {
+  try {
+    const y = parseYaml(readText(path.join(ROOT, 'config/schedule.yaml')) || '') || {};
+    return (y.schedules || []).map((s) => ({ name: s.name, cron: s.cron, pipeline: s.pipeline, enabled: Boolean(s.enabled), manualApproval: Boolean(s.manual_approval) }));
+  } catch { return []; }
+}
+
+function scanProductions() {
+  const ws = path.join(ROOT, 'workspace');
+  if (!exists(ws)) return [];
+  const byId = new Map();
+  for (const run of fs.readdirSync(ws)) {
+    const renderDir = path.join(ws, run, 'render');
+    if (!exists(renderDir)) continue;
+    const att = latestAttempt(renderDir);
+    if (!att) continue;
+    const prod = readJson(path.join(att, 'output.json'));
+    if (!prod || !prod.video?.path) continue;
+    const pub = readStepOutput(run, 'publish');
+    const publish = pub?.output ? {
+      status: pub.output.status, url: pub.output.url || null,
+      platformVideoId: pub.output.platformVideoId || null, publishId: pub.output.publishId || null,
+      error: pub.output.error || null, precheck: pub.output.precheck || null,
+    } : null;
+    byId.set(prod.productionId, {
+      ...prod,
+      coverPortrait: prod.coverPortrait || null,
+      runId: run,
+      renderDir: relOf(att),
+      publish,
+      videoExists: exists(safePath(prod.video.path) || ''),
+      coverExists: prod.cover?.path ? exists(safePath(prod.cover.path) || '') : false,
+      coverPortraitExists: prod.coverPortrait?.path ? exists(safePath(prod.coverPortrait.path) || '') : false,
+    });
+  }
+  return [...byId.values()].sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+}
+
+function topicUsage() {
+  const map = new Map();
+  for (const p of scanProductions()) {
+    const tid = p.themeId;
+    if (!tid) continue;
+    const cur = map.get(tid) || { themeId: tid, productions: [], published: null };
+    cur.productions.push({ productionId: p.productionId, runId: p.runId, createdAt: p.createdAt });
+    if (p.publish && ['published', 'submitted'].includes(p.publish.status)) cur.published = p.publish;
+    map.set(tid, cur);
+  }
+  return map;
+}
+
+function topicsView() {
+  const usage = topicUsage();
+  const seen = new Set();
+  const themes = [];
+  const files = [];
+  for (const src of themeSources()) {
+    if (src.path.startsWith('fixtures/')) continue; // 样例数据不进主题库
+    const doc = readJson(path.join(ROOT, src.path));
+    if (!doc?.themes) continue;
+    files.push({ path: src.path, label: src.label, generatedAt: doc.generatedAt || null, count: doc.themes.length });
+    for (const t of doc.themes) {
+      if (seen.has(t.id)) continue;
+      seen.add(t.id);
+      const u = usage.get(t.id) || null;
+      themes.push({
+        ...t,
+        themesFile: src.path,
+        usage: u ? { productions: u.productions.length, published: Boolean(u.published), last: u.productions[u.productions.length - 1] || null } : { productions: 0, published: false, last: null },
+      });
+    }
+  }
+  const rank = (a, b) => (b.confidence ?? 0) - (a.confidence ?? 0);
+  // 推荐只取“当前选题”那一份，避免把历史文件 / fixture 混进来
+  const primaryPath = files.find((f) => f.path === 'data/themes/latest.json')?.path || files[0]?.path || null;
+  const primary = themes.filter((t) => t.themesFile === primaryPath);
+  return {
+    files,
+    primaryPath,
+    themes,
+    recommendations: {
+      external: primary.filter((t) => t.source === 'external').sort(rank).slice(0, 3),
+      internal: primary.filter((t) => t.source === 'internal').sort(rank).slice(0, 3),
+    },
+    counts: { total: themes.length, external: themes.filter((t) => t.source === 'external').length, internal: themes.filter((t) => t.source === 'internal').length, published: themes.filter((t) => t.usage.published).length },
+  };
+}
+
+// ---------------------------------------------------------------- 单步执行（创作/发布流水线用）
+function runChild({ runId, pipeline, args, env = {}, onDone }) {
+  if (activeRunId) throw Object.assign(new Error(`已有任务在运行：${activeRunId}，请等它结束或先停止`), { status: 409 });
+  const state = { runId, pipeline, lines: [], startedAt: Date.now(), child: null, stopping: false, adhoc: true };
+  live.set(runId, state);
+  activeRunId = runId;
+
+  const logFile = path.join(ROOT, 'workspace', runId, 'console.log');
+  fs.mkdirSync(path.dirname(logFile), { recursive: true });
+  const fd = fs.openSync(logFile, 'a');
+  const push = (stream, line) => {
+    const item = { stream, line, t: Date.now() };
+    state.lines.push(item);
+    if (state.lines.length > 5000) state.lines.splice(0, 1000);
+    broadcast({ type: 'log', runId, ...item });
+  };
+
+  const fullEnv = { ...process.env, ...env };
+  const child = spawn(process.execPath, args, { cwd: ROOT, env: fullEnv, detached: true, stdio: ['ignore', 'pipe', 'pipe'] });
+  state.child = child;
+  const wire = (stream, chunk) => {
+    fs.writeSync(fd, chunk);
+    for (const line of chunk.toString().split('\n')) {
+      if (!line.trim()) continue;
+      push(stream, line);
+      const m = /^\[run\]\s+(step_start|step_end|run_start|run_end)\s*(\S*)\s*(\S*)/.exec(line);
+      if (m) broadcast({ type: 'event', runId, name: m[1], stepId: m[2] || null, status: m[3] || null });
+    }
+  };
+  child.stdout.on('data', (c) => wire('stdout', c));
+  child.stderr.on('data', (c) => wire('stderr', c));
+
+  broadcast({ type: 'started', runId, pipeline, startedAt: state.startedAt });
+
+  return new Promise((resolve) => {
+    child.on('error', (e) => push('stderr', `启动失败：${e.message}`));
+    child.on('exit', (code, signal) => {
+      try { fs.closeSync(fd); } catch {}
+      state.exitCode = code;
+      state.finishedAt = Date.now();
+      activeRunId = null;
+      let extra = null;
+      try { extra = onDone ? onDone(code) : null; } catch {}
+      broadcast({ type: 'done', runId, code, signal, run: null, adhoc: true, extra });
+      resolve({ code, signal, logFile: relOf(logFile), extra });
+    });
+  });
+}
+
+const cleanTags = (tags) => (Array.isArray(tags) ? tags : [])
+  .map((t) => String(t).trim().slice(0, 20)).filter(Boolean)
+  .filter((t, i, a) => a.indexOf(t) === i).slice(0, 10);
+
+function patchScriptDraft(draft, patch = {}) {
+  const out = JSON.parse(JSON.stringify(draft));
+  if (patch.title != null) out.metadataDraft.title = String(patch.title).trim().slice(0, 80);
+  if (patch.description != null) out.metadataDraft.description = String(patch.description).slice(0, 2000);
+  if (patch.tags != null) out.metadataDraft.tags = cleanTags(patch.tags);
+  if (Array.isArray(patch.scenes)) {
+    if (patch.scenes.length < 2 || patch.scenes.length > 12) throw Object.assign(new Error('分镜数量必须是 2–12 个'), { status: 400 });
+    out.storyboard.scenes = patch.scenes.map((s, i) => {
+      const kind = ['title', 'point', 'outro'].includes(s.kind) ? s.kind : (i === 0 ? 'title' : 'point');
+      const heading = String(s.heading || '').trim();
+      if (!heading) throw Object.assign(new Error(`第 ${i + 1} 个分镜缺标题`), { status: 400 });
+      const durationSec = Number(s.durationSec);
+      if (!(durationSec >= 2 && durationSec <= 20)) throw Object.assign(new Error(`第 ${i + 1} 个分镜时长需在 2–20 秒`), { status: 400 });
+      return { kind, heading: heading.slice(0, 24), ...(s.body ? { body: String(s.body).slice(0, 60) } : {}), durationSec };
+    });
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------- pipeline 元信息
 const UI = {
   'create-video': { title: '一键出片', icon: '🎬', desc: '写稿 → 渲染成片 → 发布预检（可选真投稿）', accent: 'create' },
@@ -330,6 +607,124 @@ const server = http.createServer(async (req, res) => {
           confidence: t.confidence ?? null, durationSec: t.brief?.durationSec ?? null,
         })),
       });
+    }
+
+
+    // ------------------------------------------------------------ 业务视图
+    if (req.method === 'GET' && p === '/api/data') {
+      return json(res, 200, { dashboard: dashboardView(), sources: sourcesView(), schedule: scheduleView() });
+    }
+    if (req.method === 'GET' && p === '/api/topics') return json(res, 200, topicsView());
+    if (req.method === 'GET' && p === '/api/productions') return json(res, 200, { productions: scanProductions() });
+
+    if (req.method === 'GET' && p === '/api/create/draft') {
+      const runId = cleanId(url.searchParams.get('id'));
+      const step = readStepOutput(runId, 'script');
+      if (!step?.output) return bad(res, 404, '没有这个稿子');
+      const out = step.output;
+      const themes = readJson(safePath(out.sourceRef?.themesFile || '') || '');
+      const theme = themes?.themes?.find((x) => x.id === out.sourceRef?.themeId) || null;
+      return json(res, 200, {
+        runId,
+        theme: theme ? { id: theme.id, title: theme.title, source: theme.source, confidence: theme.confidence, brief: theme.brief } : null,
+        title: out.metadataDraft?.title || '',
+        description: out.metadataDraft?.description || '',
+        tags: out.metadataDraft?.tags || [],
+        scenes: out.storyboard?.scenes || [],
+        scriptPath: out.script?.path || null,
+        scriptMarkdown: out.script?.path ? readText(safePath(out.script.path) || '') : null,
+        totalSec: (out.storyboard?.scenes || []).reduce((a, x) => a + (x.durationSec || 0), 0),
+      });
+    }
+
+    if (req.method === 'POST' && p === '/api/create/script') {
+      const body = await readBody(req);
+      const themesRel = String(body.themesPath || 'data/themes/latest.json');
+      const themesAbs = safePath(themesRel);
+      if (!themesAbs || !exists(themesAbs)) return bad(res, 400, `选题文件不存在：${themesRel}`);
+      const runId = cleanId(body.runId) || `create-${stamp()}`;
+      const env = {};
+      if (body.themeId) env.OPC_THEME_ID = String(body.themeId);
+      const args = ['bin/opc', 'run-step', '--skill', 'generate-script', '--id', 'script', '--input', themesRel,
+        '--run-id', runId, '--launcher', 'spawn', '--verbose', '--timeout', '900'];
+      const { code } = await runChild({ runId, pipeline: 'create-script', args, env });
+      const step = readStepOutput(runId, 'script');
+      if (code !== 0 || !step?.output) {
+        return json(res, 200, { runId, ok: false, error: step?.error || { code: 'SCRIPT_FAILED', message: '写稿失败' }, log: step?.dir || null });
+      }
+      const out = step.output;
+      const themes = readJson(themesAbs);
+      const theme = themes?.themes?.find((x) => x.id === out.sourceRef?.themeId) || null;
+      return json(res, 200, {
+        runId, ok: true,
+        draft: {
+          title: out.metadataDraft?.title || '',
+          description: out.metadataDraft?.description || '',
+          tags: out.metadataDraft?.tags || [],
+          scenes: out.storyboard?.scenes || [],
+          scriptPath: out.script?.path || null,
+          scriptMarkdown: out.script?.path ? readText(safePath(out.script.path) || '') : null,
+          totalSec: (out.storyboard?.scenes || []).reduce((a, x) => a + (x.durationSec || 0), 0),
+          theme: theme ? { id: theme.id, title: theme.title, source: theme.source, confidence: theme.confidence } : null,
+        },
+      });
+    }
+
+    if (req.method === 'POST' && p === '/api/create/render') {
+      const body = await readBody(req);
+      const runId = cleanId(body.runId);
+      const step = readStepOutput(runId, 'script');
+      if (!step?.output) return bad(res, 404, '稿子不存在，先写稿');
+      let inputRel = path.join(step.dir, 'output.json');
+      if (body.patch) {
+        const patched = patchScriptDraft(step.output, body.patch);
+        if (body.scriptMarkdown) {
+          const mdRel = path.join('workspace', runId, 'edit', 'script.md');
+          const mdAbs = path.join(ROOT, mdRel);
+          fs.mkdirSync(path.dirname(mdAbs), { recursive: true });
+          fs.writeFileSync(mdAbs, String(body.scriptMarkdown));
+          patched.script = { ...(patched.script || {}), path: mdRel };
+        }
+        const editRel = path.join('workspace', runId, 'edit', 'script-output.json');
+        const editAbs = path.join(ROOT, editRel);
+        fs.mkdirSync(path.dirname(editAbs), { recursive: true });
+        fs.writeFileSync(editAbs, JSON.stringify(patched, null, 2) + '\n');
+        inputRel = editRel;
+      }
+      const args = ['bin/opc', 'run-step', '--skill', 'render-remotion', '--id', 'render', '--contract', 'production',
+        '--input', inputRel, '--run-id', runId, '--launcher', 'spawn', '--verbose', '--timeout', '1500'];
+      const { code } = await runChild({ runId, pipeline: 'create-render', args });
+      const render = readStepOutput(runId, 'render');
+      if (code !== 0 || !render?.output) {
+        return json(res, 200, { runId, ok: false, error: render?.error || { code: 'RENDER_FAILED', message: '渲染失败' } });
+      }
+      const prod = scanProductions().find((x) => x.productionId === render.output.productionId) || render.output;
+      return json(res, 200, { runId, ok: true, production: prod });
+    }
+
+    if (req.method === 'POST' && p === '/api/publish') {
+      const body = await readBody(req);
+      const runId = cleanId(body.runId);
+      const render = readStepOutput(runId, 'render');
+      if (!render?.output) return bad(res, 404, '这条 run 还没有成片');
+      let inputRel = path.join(render.dir, 'output.json');
+      if (body.metadata) {
+        const prod = JSON.parse(JSON.stringify(render.output));
+        const meta = body.metadata;
+        if (meta.title != null) prod.metadataDraft.title = String(meta.title).trim().slice(0, 80);
+        if (meta.description != null) prod.metadataDraft.description = String(meta.description).slice(0, 2000);
+        if (meta.tags != null) prod.metadataDraft.tags = cleanTags(meta.tags);
+        const inRel = path.join('workspace', runId, 'publish-input.json');
+        fs.writeFileSync(path.join(ROOT, inRel), JSON.stringify(prod, null, 2) + '\n');
+        inputRel = inRel;
+      }
+      // 显式覆盖：继承来的环境变量也不能让「只跑预检」变成真投稿
+      const env = { OPC_PUBLISH_ENABLED: body.publish === true ? '1' : '' };
+      const args = ['bin/opc', 'run-step', '--skill', 'publish-bilibili', '--id', 'publish', '--contract', 'publish-record',
+        '--input', inputRel, '--run-id', runId, '--launcher', 'spawn', '--verbose', '--timeout', '900', '--max-attempts', '1'];
+      const { code } = await runChild({ runId, pipeline: 'publish', args, env });
+      const pub = readStepOutput(runId, 'publish');
+      return json(res, 200, { runId, ok: code === 0, record: pub?.output || null, error: pub?.error || null });
     }
 
     if (req.method === 'GET' && p === '/api/runs') return json(res, 200, { runs: listRuns() });
