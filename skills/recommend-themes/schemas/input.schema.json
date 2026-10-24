@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "recommend-themes input",
+  "description": "dashboard v1 平铺输入；也接受 step-envelope（取 data）。",
+  "$ref": "opc/dashboard.schema.json"
+}

@@ -1,0 +1,333 @@
+#!/usr/bin/env node
+// OPC 调度器 CLI（A-core）：M1 单步隔离 + M2 pipeline / cron / task_status。
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import YAML from 'yaml';
+import { createValidator } from '../scheduler/lib/schema.js';
+import { validateFixtures } from '../scheduler/lib/fixtures.js';
+import { StepExecutor, newRunId } from '../scheduler/lib/executor.js';
+import { runPipeline, loadPipelineConfig } from '../scheduler/lib/pipeline.js';
+import { loadSchedules, runDue, startScheduler } from '../scheduler/lib/cron.js';
+import { TaskStatusStore, taskPatchFromEnvelope } from '../scheduler/lib/taskstatus.js';
+
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const DEFAULT_ROOT = path.resolve(HERE, '..');
+
+function parseArgs(argv) {
+  const positional = [];
+  const flags = {};
+  const booleanFlags = new Set(['help', 'json', 'quiet', 'verbose', 'once']);
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (!a.startsWith('--')) { positional.push(a); continue; }
+    const key = a.slice(2);
+    if (booleanFlags.has(key)) { flags[key] = true; continue; }
+    const v = argv[i + 1];
+    if (v === undefined || v.startsWith('--')) throw new Error(`--${key} 缺少值`);
+    flags[key] = v;
+    i++;
+  }
+  return { positional, flags };
+}
+
+const rootOf = (flags) => (flags.root ? path.resolve(flags.root) : DEFAULT_ROOT);
+const relOf = (root, p) => path.relative(root, p) || p;
+
+function makeExecutor(flags, root) {
+  return new StepExecutor({
+    root,
+    ...(flags['pi-bin'] ? { piBin: flags['pi-bin'] } : {}),
+    launcher: flags.launcher || process.env.OPC_LAUNCHER || 'auto',
+    ...(flags.verbose ? { onLog: (r) => console.error(`[${r.level}] ${r.stepId} ${r.message}`) } : {}),
+  });
+}
+
+function printStepResult(root, step) {
+  const err = step.error ? `  error=${step.error.code}` : '';
+  const outputPath = typeof step.output === 'string' ? step.output : step.output?.path;
+  const out = outputPath ? `  output=${relOf(root, outputPath)}` : '';
+  console.log(`  ${step.id.padEnd(24)} ${String(step.status).padEnd(8)} attempt=${step.attempt ?? '-'}${out}${err}`);
+}
+
+function cmdValidateFixtures(flags) {
+  const root = rootOf(flags);
+  const validator = createValidator(root);
+  for (const w of validator.warnings) console.error(`WARN ${w}`);
+  const { checked, results, failures } = validateFixtures(root, validator);
+  if (!flags.quiet) {
+    for (const r of results) console.log(`${r.ok ? 'OK  ' : 'FAIL'} ${r.file}  ->  ${r.ref}`);
+  }
+  if (failures.length) {
+    console.error(`\n${failures.length} 个 fixture 未通过校验：`);
+    for (const f of failures) {
+      console.error(`- ${f.file}${f.ref ? ` (${f.ref})` : ''}`);
+      for (const e of f.errors.slice(0, 20)) console.error(`    ${e}`);
+    }
+    return 1;
+  }
+  console.log(`\n全部通过：${checked} 个 fixture 文件`);
+  return 0;
+}
+
+function cmdValidate(positional, flags) {
+  const [ref, file] = positional;
+  if (!ref || !file) throw new Error('用法: opc validate <契约名|schema路径> <json文件>');
+  const validator = createValidator(rootOf(flags));
+  const data = JSON.parse(fs.readFileSync(path.resolve(file), 'utf8'));
+  const v = validator.validate(ref, data);
+  if (!v.ok) {
+    console.error(`FAIL ${file} -> ${ref}`);
+    for (const e of v.errors) console.error(`  ${e}`);
+    return 1;
+  }
+  console.log(`OK ${file} -> ${ref}`);
+  return 0;
+}
+
+async function cmdRunStep(flags) {
+  const root = rootOf(flags);
+  if (!flags.skill) throw new Error('用法: opc run-step --skill <name> --input <file> [--contract <name>] [--timeout 秒]');
+  if (!flags.input) throw new Error('缺少 --input');
+  const input = path.resolve(flags.input);
+  if (!fs.existsSync(input)) throw new Error(`输入文件不存在: ${input}`);
+  const retry = {};
+  if (flags['max-attempts']) retry.maxAttempts = Number(flags['max-attempts']);
+  if (flags['base-delay']) retry.baseDelayMs = Number(flags['base-delay']);
+  const step = {
+    id: flags.id || flags.skill,
+    skill: flags.skill,
+    ...(flags.contract ? { contract: flags.contract } : {}),
+    ...(flags.timeout ? { timeout: Number(flags.timeout) } : {}),
+    ...(flags.prompt ? { prompt: flags.prompt } : {}),
+    ...(Object.keys(retry).length ? { retry } : {}),
+  };
+  const ctx = { runId: flags['run-id'] || newRunId(), pipelineId: flags.pipeline || 'adhoc' };
+  const executor = makeExecutor(flags, root);
+  const tasks = new TaskStatusStore(root);
+  tasks.initRun({ runId: ctx.runId, pipelineId: ctx.pipelineId, steps: [step] });
+  tasks.update(ctx.runId, step.id, { status: 'running', startedAt: new Date().toISOString() }, { pipelineId: ctx.pipelineId, skill: step.skill });
+
+  let env;
+  try {
+    env = await executor.executeWithRetry(step, ctx, input);
+  } catch (e) {
+    tasks.update(ctx.runId, step.id, {
+      status: 'failed',
+      finishedAt: new Date().toISOString(),
+      error: { code: 'STEP_CONFIG_ERROR', message: e.message },
+    }, { pipelineId: ctx.pipelineId, skill: step.skill });
+    throw e;
+  }
+  tasks.update(ctx.runId, step.id, taskPatchFromEnvelope(env), { pipelineId: ctx.pipelineId, skill: step.skill });
+
+  console.log(`runId:    ${ctx.runId}`);
+  console.log(`status:   ${env.status}`);
+  console.log(`attempt:  ${env.attempt}`);
+  console.log(`output:   ${env.output ? relOf(root, env.output.path) : '(none)'}`);
+  if (env.error) console.log(`error:    ${env.error.code} ${env.error.message}`);
+  const last = path.join(root, 'workspace', ctx.runId, step.id, `attempt-${env.attempt}`, 'envelope.json');
+  console.log(`envelope: ${relOf(root, last)}`);
+  console.log(`tasks:    ${relOf(root, tasks.file)}`);
+  if (flags.json) console.log(JSON.stringify(env, null, 2));
+  return env.status === 'success' ? 0 : 1;
+}
+
+async function cmdRun(positional, flags) {
+  const root = rootOf(flags);
+  const pipelineId = positional[0] || flags.pipeline;
+  if (!pipelineId) throw new Error('用法: opc run <pipelineId> [--launcher spawn] [--run-id ...]');
+  const config = loadPipelineConfig(root, flags['pipeline-config'] || undefined);
+  const executor = makeExecutor(flags, root);
+  const result = await runPipeline(root, pipelineId, {
+    config,
+    executor,
+    runId: flags['run-id'],
+    ...(flags.verbose ? { onEvent: (ev) => console.error(`[run] ${ev.type} ${ev.stepId ?? ''} ${ev.status ?? ''}`.trim()) } : {}),
+  });
+  console.log(`runId:    ${result.runId}`);
+  console.log(`pipeline: ${result.pipelineId}`);
+  console.log(`status:   ${result.status}`);
+  for (const step of result.steps) printStepResult(root, step);
+  console.log(`runFile:  ${relOf(root, result.runFile)}`);
+  console.log(`tasks:    ${relOf(root, result.taskStatusFile)}`);
+  if (flags.json) {
+    console.log(JSON.stringify({
+      runId: result.runId,
+      pipelineId: result.pipelineId,
+      status: result.status,
+      steps: result.steps.map((s) => ({ id: s.id, status: s.status, attempt: s.attempt, output: s.output?.path ?? null, error: s.error ?? null })),
+    }, null, 2));
+  }
+  return result.status === 'success' ? 0 : 1;
+}
+
+function cmdPipelines(flags) {
+  const root = rootOf(flags);
+  const config = loadPipelineConfig(root, flags['pipeline-config'] || undefined);
+  for (const [id, p] of Object.entries(config.pipelines)) {
+    const steps = Array.isArray(p.steps) ? p.steps : [];
+    console.log(`${id.padEnd(24)} ${steps.length} steps  ${p.description || ''}`.trimEnd());
+    for (const s of steps) console.log(`  - ${s.id} (${s.skill})${s.depends_on?.length ? ` <- ${s.depends_on.join(',')}` : ''}`);
+  }
+  return 0;
+}
+
+async function cmdCronTick(flags) {
+  const root = rootOf(flags);
+  const now = flags.now ? new Date(flags.now) : new Date();
+  if (Number.isNaN(now.getTime())) throw new Error(`--now 不是合法时间: ${flags.now}`);
+  const schedules = loadSchedules(root, flags['schedule-config'] || undefined);
+  const config = flags['pipeline-config'] ? loadPipelineConfig(root, flags['pipeline-config']) : undefined;
+  const executor = makeExecutor(flags, root);
+  const results = await runDue(root, now, {
+    schedules,
+    config,
+    executor,
+    ...(flags['state-file'] ? { stateFile: flags['state-file'] } : {}),
+  });
+  if (!results.length) console.log(`没有到期的 schedule（${now.toISOString()}）`);
+  for (const r of results) {
+    console.log(`${r.name.padEnd(24)} ${r.status}${r.runId ? `  ${r.runId}` : ''}${r.error ? `  ${r.error}` : ''}`);
+  }
+  return results.some((r) => r.status === 'failed') ? 1 : 0;
+}
+
+async function cmdStart(flags) {
+  const root = rootOf(flags);
+  const schedules = loadSchedules(root, flags['schedule-config'] || undefined);
+  const enabled = schedules.filter((s) => s.enabled);
+  console.log(`enabled schedules: ${enabled.length ? enabled.map((s) => s.name).join(', ') : '(none)'}`);
+  if (!enabled.length) console.log('提示：config/schedule.yaml 里没有 enabled: true 的 schedule，daemon 会空转。');
+  const config = flags['pipeline-config'] ? loadPipelineConfig(root, flags['pipeline-config']) : undefined;
+  const intervalMs = flags.interval ? Number(flags.interval) * 1000 : 30_000;
+  if (!Number.isFinite(intervalMs) || intervalMs < 1000) throw new Error('--interval 至少 1 秒');
+  await startScheduler(root, {
+    intervalMs,
+    once: !!flags.once,
+    config,
+    executor: makeExecutor(flags, root),
+    ...(flags['state-file'] ? { stateFile: flags['state-file'] } : {}),
+  });
+  return 0;
+}
+
+function cmdAttempts(positional, flags) {
+  const root = rootOf(flags);
+  const ws = path.join(root, 'workspace');
+  if (!fs.existsSync(ws)) { console.log('还没有任何 run'); return 0; }
+  let runId = positional[0];
+  if (!runId) {
+    const runs = fs.readdirSync(ws).filter((d) => fs.statSync(path.join(ws, d)).isDirectory()).sort();
+    runId = runs.at(-1);
+    if (!runId) { console.log('还没有任何 run'); return 0; }
+  }
+  if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(runId)) throw new Error(`runId 非法: ${runId}`);
+  const runDir = path.join(ws, runId);
+  if (!fs.existsSync(runDir)) throw new Error(`run 不存在: ${runId}`);
+  console.log(`runId: ${runId}`);
+  let bad = 0;
+  const steps = fs.readdirSync(runDir)
+    .filter((d) => !d.startsWith('_') && fs.statSync(path.join(runDir, d)).isDirectory())
+    .filter((d) => fs.readdirSync(path.join(runDir, d)).some((a) => a.startsWith('attempt-')))
+    .sort();
+  for (const stepId of steps) {
+    const attempts = fs.readdirSync(path.join(runDir, stepId)).filter((d) => d.startsWith('attempt-')).sort();
+    let last = null;
+    for (const attempt of attempts) {
+      const envFile = path.join(runDir, stepId, attempt, 'envelope.json');
+      let status = '(no envelope)';
+      let detail = '';
+      if (fs.existsSync(envFile)) {
+        const env = JSON.parse(fs.readFileSync(envFile, 'utf8'));
+        status = env.status;
+        detail = env.error ? env.error.code : `output=${env.output ? 'yes' : 'no'} tokens=${env.usage?.totalTokens ?? 0}`;
+        last = env;
+      }
+      console.log(`  ${stepId}/${attempt}  ${status}  ${detail}`);
+    }
+    if (!last || last.status !== 'success') bad++;
+  }
+  return bad ? 1 : 0;
+}
+
+function cmdConfigCheck(flags) {
+  const root = rootOf(flags);
+  const dir = path.join(root, 'config');
+  if (!fs.existsSync(dir)) { console.log('config/ 不存在'); return 0; }
+  let bad = 0;
+  for (const f of fs.readdirSync(dir).filter((f) => /\.ya?ml$/.test(f))) {
+    try {
+      const doc = YAML.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
+      console.log(`OK   config/${f}${doc && typeof doc === 'object' ? `  (${Object.keys(doc).join(', ')})` : ''}`);
+    } catch (e) {
+      console.error(`FAIL config/${f}: ${e.message}`);
+      bad++;
+    }
+  }
+  return bad ? 1 : 0;
+}
+
+const HELP = `opc —— OPC 调度器 CLI（A-core）
+
+用法:
+  opc validate-fixtures [--root <dir>] [--quiet]
+      校验 fixtures/ 下的 output*.json。目录名自动映射契约，可用 fixtures/<dir>/contract.json 覆盖。
+
+  opc validate <契约名|schema路径> <file.json>
+      校验单个 JSON 文件。
+
+  opc run-step --skill <name> --input <file> [选项]
+      跑单步：attempt 目录、run.sh、新终端、重试、双判定、ledger、task_status。
+      选项: --id --contract --timeout 秒 --launcher auto|terminal|tmux|spawn
+            --pi-bin --max-attempts --base-delay 毫秒 --pipeline --run-id --json --verbose
+
+  opc run <pipelineId> [选项]
+      跑整条 pipeline：depends_on DAG、output→input 拷贝、task_status、run.json。
+      选项: --run-id --launcher --pi-bin --pipeline-config --json --verbose
+
+  opc pipelines [--pipeline-config <file>]
+      列出 config/pipeline.yaml 里的 pipeline。
+
+  opc cron-tick [--now ISO] [选项]
+      跑当前分钟到期的 schedule（同一分钟去重；dependencies 未成功则跳过）。
+
+  opc start [--once] [--interval 秒]
+      schedule daemon：默认每 30 秒检查一次；CI/测试用 --once。
+
+  opc attempts [runId] [--root <dir>]
+      查看某个 run（默认最近一个）的每个 attempt 状态。
+
+  opc config-check [--root <dir>]
+      解析 config/*.yaml，确认语法。
+
+  opc help
+`;
+
+(async () => {
+  try {
+    const argv = process.argv.slice(2);
+    const cmd = argv[0];
+    const { positional, flags } = parseArgs(argv.slice(1));
+    let code = 0;
+    switch (cmd) {
+      case 'validate-fixtures': code = cmdValidateFixtures(flags); break;
+      case 'validate': code = cmdValidate(positional, flags); break;
+      case 'run-step': code = await cmdRunStep(flags); break;
+      case 'run': code = await cmdRun(positional, flags); break;
+      case 'pipelines': code = cmdPipelines(flags); break;
+      case 'cron-tick': code = await cmdCronTick(flags); break;
+      case 'start': code = await cmdStart(flags); break;
+      case 'attempts': code = cmdAttempts(positional, flags); break;
+      case 'config-check': code = cmdConfigCheck(flags); break;
+      case 'help':
+      case '--help':
+      case undefined: console.log(HELP); break;
+      default: console.error(`未知命令: ${cmd}\n`); console.log(HELP); code = 2;
+    }
+    process.exitCode = code;
+  } catch (e) {
+    console.error(`opc: ${e.message}`);
+    process.exitCode = 1;
+  }
+})();

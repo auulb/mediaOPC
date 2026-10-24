@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "dataSource": "bilibili-hot",
+  "platform": "bilibili",
+  "timestamp": "2024-01-15T10:00:00Z",
+  "params": { "limit": 3 },
+  "cache": {
+    "hit": false,
+    "key": "bilibili-hot-3f2a1c9d0e4b",
+    "expiresAt": "2024-01-15T11:00:00Z"
+  },
+  "items": [
+    {
+      "id": "BV1xx411c7mD",
+      "title": "30秒看懂 AI 动画的生产链",
+      "url": "https://www.bilibili.com/video/BV1xx411c7mD",
+      "views": 1280000,
+      "likes": 96000,
+      "comments": 4200,
+      "shares": 3100,
+      "favorites": 28000,
+      "tags": ["AI", "动画", "教程"],
+      "category": "科技",
+      "durationSec": 183,
+      "publishDate": "2024-01-13",
+      "publishedAt": "2024-01-13T08:30:00Z",
+      "channel": { "id": "12345", "name": "测试UP", "subscribers": null },
+      "metrics": { "engagement": 0.1027, "viewsPerHour": 25557.56, "velocity": "rising" }
+    },
+    {
+      "id": "BV1yy411c7mE",
+      "title": "Remotion 实战：用 React 写一条 30 秒动画",
+      "url": "https://www.bilibili.com/video/BV1yy411c7mE",
+      "views": 640000,
+      "likes": 38000,
+      "comments": 1900,
+      "shares": 1200,
+      "favorites": 15000,
+      "tags": ["Remotion", "动画", "前端"],
+      "category": "科技",
+      "durationSec": 640,
+      "publishDate": "2024-01-12",
+      "publishedAt": "2024-01-12T12:00:00Z",
+      "channel": { "id": "67890", "name": "前端实验室", "subscribers": null },
+      "metrics": { "engagement": 0.0877, "viewsPerHour": 13897.39, "velocity": "stable" }
+    },
+    {
+      "id": "BV1zz411c7mF",
+      "title": "AI 绘画工作流 2024 版",
+      "url": "https://www.bilibili.com/video/BV1zz411c7mF",
+      "views": 320000,
+      "likes": 21000,
+      "comments": 800,
+      "shares": 500,
+      "favorites": 9000,
+      "tags": ["AI", "绘画", "教程"],
+      "category": "设计",
+      "durationSec": 421,
+      "publishDate": "2024-01-10",
+      "publishedAt": "2024-01-10T09:00:00Z",
+      "channel": { "id": "24680", "name": "设计小站", "subscribers": null },
+      "metrics": { "engagement": 0.0978, "viewsPerHour": 3478.26, "velocity": "falling" }
+    }
+  ],
+  "warnings": []
+}

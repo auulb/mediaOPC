@@ -1,0 +1,66 @@
+{
+  "generatedAt": "2026-10-24T09:45:46.145Z",
+  "sources": [
+    {
+      "id": "raw-0-bilibili-hot",
+      "file": "workspace/demo-trends-1/fetch-bilibili/attempt-1/output.json",
+      "kind": "raw-items",
+      "dataSource": "bilibili-hot",
+      "timestamp": "2026-10-24T09:26:30.983Z"
+    },
+    {
+      "id": "raw-1-internal-metrics",
+      "file": "workspace/demo-trends-1/fetch-internal/attempt-1/output.json",
+      "kind": "raw-items",
+      "dataSource": "internal-metrics",
+      "timestamp": "2026-10-24T09:33:36.431Z"
+    },
+    {
+      "id": "token-ledger",
+      "file": "data/token_ledger.jsonl",
+      "kind": "token-ledger"
+    },
+    {
+      "id": "task-status",
+      "file": "dashboard/task_status.json",
+      "kind": "task-status"
+    }
+  ],
+  "internalPerformance": {
+    "episodes": [
+      {
+        "id": "pub_20240115_bili_001",
+        "themeId": "theme_20240115_001",
+        "title": "30秒看懂：AI 动画是怎么做出来的",
+        "platform": "bilibili",
+        "window": "latest",
+        "views": 5553126,
+        "likes": 277343,
+        "comments": 89450,
+        "engagement": 0.0942,
+        "tokensSpent": null,
+        "roi": null,
+        "sourceRef": [
+          {
+            "source": "raw-1-internal-metrics",
+            "pointer": "/items/0",
+            "itemId": "BV1xx411c7mD"
+          }
+        ]
+      }
+    ],
+    "avgEngagement": {
+      "value": 0.0942,
+      "sourceRef": [
+        {
+          "source": "raw-1-internal-metrics",
+          "pointer": "/items/0",
+          "itemId": "BV1xx411c7mD"
+        }
+      ]
+    },
+    "topPerformers": [
+      "pub_20240115_bili_001"
+    ]
+  }
+}

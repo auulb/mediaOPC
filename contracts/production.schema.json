@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "opc://contracts/production.schema.json",
+  "title": "Production Manifest (成片清单)",
+  "description": "C-media 创作/渲染步骤的产出。producer: C (render-*)；consumer: C (publish-*)。文件路径均相对仓库根目录（OPC_ROOT），因为调度器只拷贝 output.json，不拷贝产物文件。",
+  "x-version": 1,
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "productionId", "themeId", "createdAt", "renderer", "video", "cover", "metadataDraft", "targetPlatforms", "sourceRef"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "productionId": { "type": "string", "pattern": "^prod_[A-Za-z0-9_-]+$" },
+    "themeId": { "type": "string", "minLength": 1, "description": "对应 themes.schema.json 中 themes[].id" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "renderer": { "enum": ["remotion", "hyperframes", "hypit", "ffmpeg"] },
+    "template": { "type": "string", "description": "渲染模板 ID，如 remotion/explainer-30s" },
+    "video": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "durationSec", "width", "height", "fps", "sizeBytes"],
+      "properties": {
+        "path": { "$ref": "#/$defs/relPath" },
+        "durationSec": { "type": "number", "exclusiveMinimum": 0 },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "fps": { "type": "number", "exclusiveMinimum": 0 },
+        "sizeBytes": { "type": "integer", "minimum": 1 },
+        "codec": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "cover": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "width", "height"],
+      "properties": {
+        "path": { "$ref": "#/$defs/relPath" },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "script": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path": { "$ref": "#/$defs/relPath" },
+        "storyboardPath": { "$ref": "#/$defs/relPath" }
+      }
+    },
+    "metadataDraft": {
+      "description": "标题/描述/标签草稿，发布步骤可按平台规则再裁剪",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description", "tags"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "tags": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 20 }
+        },
+        "category": { "type": "string" }
+      }
+    },
+    "targetPlatforms": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/platform" }
+    },
+    "sourceRef": {
+      "description": "溯源：来自哪个主题文件",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["themesFile", "themeId"],
+      "properties": {
+        "themesFile": { "$ref": "#/$defs/relPath" },
+        "themeId": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "relPath": { "type": "string", "pattern": "^(?!/)(?!.*\\.\\./)[A-Za-z0-9_./-]+$" },
+    "platform": { "enum": ["bilibili", "youtube", "douyin", "tiktok"] }
+  }
+}

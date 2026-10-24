@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "recommend-themes output",
+  "description": "themes v1，契约见 contracts/themes.schema.json。",
+  "$ref": "opc/themes.schema.json"
+}

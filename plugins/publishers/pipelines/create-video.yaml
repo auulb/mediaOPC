@@ -1,0 +1,41 @@
+# C-media 创作 + 发布流水线（用 --pipeline-config 加载，不改 A 的 config/pipeline.yaml）
+#
+#   node bin/opc run create-video \
+#     --pipeline-config plugins/publishers/pipelines/create-video.yaml
+#
+# 前置：data/themes/latest.json 存在（= 任意一次 recommend-themes 的 output.json）
+# 发布：默认只预检不上传；要真发需导出 OPC_PUBLISH_ENABLED=1
+
+version: 1
+
+pipelines:
+  create-video:
+    description: 选题 → 脚本/分镜 → Remotion 渲染 → B 站预检（可选投稿）
+    steps:
+      - id: script
+        skill: generate-script
+        input: data/themes/latest.json
+        timeout: 900
+        retry:
+          maxAttempts: 2
+          baseDelayMs: 3000
+        tools: [read, write, bash]
+
+      - id: render
+        skill: render-remotion
+        contract: production
+        depends_on: [script]
+        timeout: 1200
+        tools: [read, write, bash]
+
+      - id: publish
+        skill: publish-bilibili
+        contract: publish-record
+        depends_on: [render]
+        timeout: 900
+        # 发布不做调度器级重试：重复提交比失败更糟
+        retry:
+          maxAttempts: 1
+        tools: [read, write, bash]
+        # 只声明变量名，值由调度器从自身 env 注入；不设则只预检
+        env: [OPC_PUBLISH_ENABLED]

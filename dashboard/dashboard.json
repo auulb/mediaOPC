@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-24T09:45:46.145Z",
+  "sources": [
+    {
+      "id": "raw-0-bilibili-hot",
+      "file": "workspace/demo-trends-1/fetch-bilibili/attempt-1/output.json",
+      "kind": "raw-items",
+      "dataSource": "bilibili-hot",
+      "timestamp": "2026-10-24T09:26:30.983Z"
+    },
+    {
+      "id": "raw-1-internal-metrics",
+      "file": "workspace/demo-trends-1/fetch-internal/attempt-1/output.json",
+      "kind": "raw-items",
+      "dataSource": "internal-metrics",
+      "timestamp": "2026-10-24T09:33:36.431Z"
+    },
+    {
+      "id": "token-ledger",
+      "file": "data/token_ledger.jsonl",
+      "kind": "token-ledger"
+    },
+    {
+      "id": "task-status",
+      "file": "dashboard/task_status.json",
+      "kind": "task-status"
+    }
+  ],
+  "externalTrends": {
+    "topTopics": [
+      {
+        "topic": "手机游戏",
+        "heat": 100,
+        "growth": "+0%",
+        "itemCount": 1,
+        "platforms": [
+          "bilibili"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/0",
+            "itemId": "BV1U3n46GEzY"
+          }
+        ]
+      },
+      {
+        "topic": "出行",
+        "heat": 58,
+        "growth": "+0%",
+        "itemCount": 1,
+        "platforms": [
+          "bilibili"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/1",
+            "itemId": "BV12qnt6VEM1"
+          }
+        ]
+      },
+      {
+        "topic": "搞笑",
+        "heat": 24.9,
+        "growth": "+0%",
+        "itemCount": 1,
+        "platforms": [
+          "bilibili"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/2",
+            "itemId": "BV111na6WExX"
+          }
+        ]
+      }
+    ],
+    "flowDirection": {
+      "bilibili": {
+        "value": 100,
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/0",
+            "itemId": "BV1U3n46GEzY"
+          },
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/1",
+            "itemId": "BV12qnt6VEM1"
+          },
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/2",
+            "itemId": "BV111na6WExX"
+          }
+        ]
+      }
+    },
+    "topItems": [
+      {
+        "id": "BV1U3n46GEzY",
+        "title": "《绝区零》先导演示丨挽昼",
+        "platform": "bilibili",
+        "views": 2322068,
+        "engagement": 0.3755,
+        "velocity": "rising",
+        "tags": [
+          "手机游戏"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/0",
+            "itemId": "BV1U3n46GEzY"
+          }
+        ]
+      },
+      {
+        "id": "BV12qnt6VEM1",
+        "title": "人性、欲望与奇观，自驾拉斯维加斯，现实夜之城什么样？",
+        "platform": "bilibili",
+        "views": 1345786,
+        "engagement": 0.0561,
+        "velocity": "stable",
+        "tags": [
+          "出行"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/1",
+            "itemId": "BV12qnt6VEM1"
+          }
+        ]
+      },
+      {
+        "id": "BV111na6WExX",
+        "title": "《纯阳真气》",
+        "platform": "bilibili",
+        "views": 577891,
+        "engagement": 0.099,
+        "velocity": "stable",
+        "tags": [
+          "搞笑"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/2",
+            "itemId": "BV111na6WExX"
+          }
+        ]
+      }
+    ]
+  },
+  "internalPerformance": {
+    "episodes": [
+      {
+        "id": "pub_20240115_bili_001",
+        "themeId": "theme_20240115_001",
+        "title": "30秒看懂：AI 动画是怎么做出来的",
+        "platform": "bilibili",
+        "window": "latest",
+        "views": 5553126,
+        "likes": 277343,
+        "comments": 89450,
+        "engagement": 0.0942,
+        "tokensSpent": null,
+        "roi": null,
+        "sourceRef": [
+          {
+            "source": "raw-1-internal-metrics",
+            "pointer": "/items/0",
+            "itemId": "BV1xx411c7mD"
+          }
+        ]
+      }
+    ],
+    "avgEngagement": {
+      "value": 0.0942,
+      "sourceRef": [
+        {
+          "source": "raw-1-internal-metrics",
+          "pointer": "/items/0",
+          "itemId": "BV1xx411c7mD"
+        }
+      ]
+    },
+    "topPerformers": [
+      "pub_20240115_bili_001"
+    ]
+  },
+  "tokenUsage": {
+    "today": 988249,
+    "thisWeek": 988249,
+    "costToday": 0.006,
+    "budget": 500000,
+    "utilizationRate": 1.9765,
+    "byStep": [
+      {
+        "stepId": "publish-bilibili",
+        "tokens": 526091,
+        "cost": 0
+      },
+      {
+        "stepId": "fetch-internal",
+        "tokens": 176603,
+        "cost": 0
+      },
+      {
+        "stepId": "build-dashboard",
+        "tokens": 89645,
+        "cost": 0
+      },
+      {
+        "stepId": "recommend",
+        "tokens": 70591,
+        "cost": 0
+      },
+      {
+        "stepId": "generate-script",
+        "tokens": 53318,
+        "cost": 0
+      },
+      {
+        "stepId": "fetch-bilibili",
+        "tokens": 32106,
+        "cost": 0
+      },
+      {
+        "stepId": "echo",
+        "tokens": 20031,
+        "cost": 0
+      },
+      {
+        "stepId": "render-remotion",
+        "tokens": 11306,
+        "cost": 0
+      },
+      {
+        "stepId": "first",
+        "tokens": 5206,
+        "cost": 0.003
+      },
+      {
+        "stepId": "second",
+        "tokens": 3352,
+        "cost": 0.003
+      }
+    ],
+    "sourceRef": [
+      {
+        "source": "token-ledger",
+        "pointer": ""
+      }
+    ]
+  },
+  "taskStatus": {
+    "summary": {
+      "success": 13,
+      "failed": 0,
+      "running": 1,
+      "pending": 1
+    },
+    "recent": [
+      {
+        "runId": "demo-trends-1",
+        "pipelineId": "trends-analysis",
+        "stepId": "recommend",
+        "skill": "recommend-themes",
+        "status": "pending",
+        "attempt": null,
+        "createdAt": "2026-10-24T09:44:43.700Z",
+        "startedAt": null,
+        "finishedAt": null,
+        "durationMs": null,
+        "tokens": 0,
+        "costUsd": 0,
+        "output": null,
+        "error": null
+      },
+      {
+        "runId": "demo-trends-1",
+        "pipelineId": "trends-analysis",
+        "stepId": "build-dashboard",
+        "skill": "build-dashboard",
+        "status": "running",
+        "attempt": null,
+        "createdAt": "2026-10-24T09:44:43.700Z",
+        "startedAt": "2026-10-24T09:45:34.649Z",
+        "finishedAt": null,
+        "durationMs": null,
+        "tokens": 0,
+        "costUsd": 0,
+        "output": null,
+        "error": null
+      },
+      {
+        "runId": "demo-trends-1",
+        "pipelineId": "trends-analysis",
+        "stepId": "fetch-internal",
+        "skill": "fetch-internal-metrics",
+        "status": "success",
+        "attempt": 1,
+        "createdAt": "2026-10-24T09:44:43.700Z",
+        "startedAt": "2026-10-24T09:44:55.784Z",
+        "finishedAt": "2026-10-24T09:45:34.624Z",
+        "durationMs": 38840,
+        "tokens": 92211,
+        "costUsd": 0,
+        "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/demo-trends-1/fetch-internal/attempt-1/output.json",
+        "error": null
+      },
+      {
+        "runId": "demo-trends-1",
+        "pipelineId": "trends-analysis",
+        "stepId": "fetch-bilibili",
+        "skill": "fetch-bilibili-hot",
+        "status": "success",
+        "attempt": 1,
+        "createdAt": "2026-10-24T09:44:43.700Z",
+        "startedAt": "2026-10-24T09:44:43.701Z",
+        "finishedAt": "2026-10-24T09:44:55.776Z",
+        "durationMs": 12075,
+        "tokens": 11174,
+        "costUsd": 0,
+        "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/demo-trends-1/fetch-bilibili/attempt-1/output.json",
+        "error": null
+      },
+      {
+        "runId": "real-trends-2",
+        "pipelineId": "trends-analysis",
+        "stepId": "recommend",
+        "skill": "recommend-themes",
+        "status": "success",
+        "attempt": 1,
+        "createdAt": "2026-10-24T09:36:02.524Z",
+        "startedAt": "2026-10-24T09:37:12.788Z",
+        "finishedAt": "2026-10-24T09:37:53.630Z",
+        "durationMs": 40842,
+        "tokens": 70591,
+        "costUsd": 0,
+        "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/real-trends-2/recommend/attempt-1/output.json",
+        "error": null
+      },
+      {
+        "runId": "real-trends-2",
+        "pipelineId": "trends-analysis",
+        "stepId": "build-dashboard",
+        "skill": "build-dashboard",
+        "status": "success",
+        "attempt": 1,
+        "createdAt": "2026-10-24T09:36:02.524Z",
+        "startedAt": "2026-10-24T09:36:45.819Z",
+        "finishedAt": "2026-10-24T09:37:12.783Z",
+        "durationMs": 26964,
+        "tokens": 63787,
+        "costUsd": 0,
+        "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/real-trends-2/build-dashboard/attempt-1/output.json",
+        "error": null
+      },
+      {
+        "runId": "real-trends-2",
+        "pipelineId": "trends-analysis",
+        "stepId": "fetch-internal",
+        "skill": "fetch-internal-metrics",
+        "status": "success",
+        "attempt": 1,
+        "createdAt": "2026-10-24T09:36:02.524Z",
+        "startedAt": "2026-10-24T09:36:16.864Z",
+        "finishedAt": "2026-10-24T09:36:45.812Z",
+        "durationMs": 28948,
+        "tokens": 63107,
+        "costUsd": 0,
+        "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/real-trends-2/fetch-internal/attempt-1/output.json",
+        "error": null
+      },
+      {
+        "runId": "real-trends-2",
+        "pipelineId": "trends-analysis",
+        "stepId": "fetch-bilibili",
+        "skill": "fetch-bilibili-hot",
+        "status": "success",
+        "attempt": 1,
+        "createdAt": "2026-10-24T09:36:02.524Z",
+        "startedAt": "2026-10-24T09:36:02.526Z",
+        "finishedAt": "2026-10-24T09:36:16.853Z",
+        "durationMs": 14327,
+        "tokens": 10529,
+        "costUsd": 0,
+        "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/real-trends-2/fetch-bilibili/attempt-1/output.json",
+        "error": null
+      },
+      {
+        "runId": "real-trends-1",
+        "pipelineId": "trends-analysis",
+        "stepId": "build-dashboard",
+        "skill": "build-dashboard",
+        "status": "success",
+        "attempt": 1,
+        "createdAt": "2026-10-24T09:33:08.060Z",
+        "startedAt": "2026-10-24T09:33:42.189Z",
+        "finishedAt": "2026-10-24T09:34:00.893Z",
+        "durationMs": 18704,
+        "tokens": 25858,
+        "costUsd": 0,
+        "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/real-trends-1/build-dashboard/attempt-1/output.json",
+        "error": null
+      },
+      {
+        "runId": "real-trends-1",
+        "pipelineId": "trends-analysis",
+        "stepId": "fetch-internal",
+        "skill": "fetch-internal-metrics",
+        "status": "success",
+        "attempt": 1,
+        "createdAt": "2026-10-24T09:33:08.060Z",
+        "startedAt": "2026-10-24T09:33:20.012Z",
+        "finishedAt": "2026-10-24T09:33:42.185Z",
+        "durationMs": 22173,
+        "tokens": 21285,
+        "costUsd": 0,
+        "output": "/Users/jwj/Documents/WayToAGI/opc2/workspace/real-trends-1/fetch-internal/attempt-1/output.json",
+        "error": null
+      }
+    ],
+    "sourceRef": [
+      {
+        "source": "task-status",
+        "pointer": "/tasks"
+      }
+    ]
+  }
+}

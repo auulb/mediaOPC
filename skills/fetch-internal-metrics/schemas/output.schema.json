@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "fetch-internal-metrics output",
+  "description": "平铺写出 raw-items v1（items[].internal 关联 publishId/themeId）。",
+  "$ref": "opc/raw-items.schema.json"
+}

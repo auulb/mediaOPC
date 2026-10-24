@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "opc/dashboard.schema.json",
+  "title": "Dashboard v1",
+  "description": "看板文件（设计文档 2.2 模块 2）。生产者 B-data(build-dashboard)，消费者 B-data(recommend-themes)、A-core(Web 看板)。每个指标都带 sourceRef，可跳回原始数据。",
+  "type": "object",
+  "required": ["schemaVersion", "generatedAt", "sources", "externalTrends", "internalPerformance", "tokenUsage", "taskStatus"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "sources": {
+      "type": "array",
+      "description": "本次看板用到的所有原始文件；sourceRef.source 引用这里的 id",
+      "items": {
+        "type": "object",
+        "required": ["id", "file", "kind"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
+          "file": { "type": "string", "description": "相对仓库根的路径" },
+          "kind": { "type": "string", "enum": ["raw-items", "token-ledger", "task-status", "publish-record"] },
+          "dataSource": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "externalTrends": {
+      "type": "object",
+      "required": ["topTopics", "flowDirection", "topItems"],
+      "additionalProperties": false,
+      "properties": {
+        "topTopics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["topic", "heat", "growth", "itemCount", "sourceRef"],
+            "additionalProperties": false,
+            "properties": {
+              "topic": { "type": "string" },
+              "heat": { "type": "number", "minimum": 0, "maximum": 100 },
+              "growth": { "type": "string", "pattern": "^([+-]\\d+(\\.\\d+)?%|n/a)$", "description": "与上次看板相比；无历史时为 n/a" },
+              "itemCount": { "type": "integer", "minimum": 0 },
+              "platforms": { "type": "array", "items": { "type": "string" } },
+              "sourceRef": { "$ref": "#/$defs/sourceRefs" }
+            }
+          }
+        },
+        "flowDirection": {
+          "type": "object",
+          "description": "各平台流量占比(%)，key 为平台名",
+          "additionalProperties": { "$ref": "#/$defs/metric" }
+        },
+        "topItems": {
+          "type": "array",
+          "description": "按热度排序的原始条目摘录",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "platform", "views", "engagement", "sourceRef"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "platform": { "type": "string" },
+              "views": { "type": "integer", "minimum": 0 },
+              "engagement": { "type": "number", "minimum": 0 },
+              "velocity": { "type": "string" },
+              "tags": { "type": "array", "items": { "type": "string" } },
+              "sourceRef": { "$ref": "#/$defs/sourceRefs" }
+            }
+          }
+        }
+      }
+    },
+    "internalPerformance": {
+      "type": "object",
+      "required": ["episodes", "avgEngagement", "topPerformers"],
+      "additionalProperties": false,
+      "properties": {
+        "episodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "platform", "views", "engagement", "sourceRef"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "description": "publishId" },
+              "themeId": { "type": "string" },
+              "title": { "type": "string" },
+              "platform": { "type": "string" },
+              "window": { "type": "string" },
+              "views": { "type": "integer", "minimum": 0 },
+              "likes": { "type": "integer", "minimum": 0 },
+              "comments": { "type": "integer", "minimum": 0 },
+              "engagement": { "type": "number", "minimum": 0 },
+              "tokensSpent": { "type": ["integer", "null"], "minimum": 0 },
+              "roi": { "type": ["number", "null"], "description": "views / 1000 tokens；无 token 记录时为 null" },
+              "sourceRef": { "$ref": "#/$defs/sourceRefs" }
+            }
+          }
+        },
+        "avgEngagement": { "$ref": "#/$defs/metric" },
+        "topPerformers": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "tokenUsage": {
+      "type": "object",
+      "required": ["today", "thisWeek", "budget", "utilizationRate", "byStep", "sourceRef"],
+      "additionalProperties": false,
+      "properties": {
+        "today": { "type": "integer", "minimum": 0 },
+        "thisWeek": { "type": "integer", "minimum": 0 },
+        "costToday": { "type": "number", "minimum": 0 },
+        "budget": { "type": "integer", "minimum": 0, "description": "日预算 tokens" },
+        "utilizationRate": { "type": "number", "minimum": 0 },
+        "byStep": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["stepId", "tokens"],
+            "additionalProperties": false,
+            "properties": {
+              "stepId": { "type": "string" },
+              "tokens": { "type": "integer", "minimum": 0 },
+              "cost": { "type": "number", "minimum": 0 }
+            }
+          }
+        },
+        "sourceRef": { "$ref": "#/$defs/sourceRefs" }
+      }
+    },
+    "taskStatus": {
+      "type": "object",
+      "required": ["summary", "sourceRef"],
+      "additionalProperties": false,
+      "properties": {
+        "summary": {
+          "type": "object",
+          "required": ["success", "failed", "running", "pending"],
+          "additionalProperties": false,
+          "properties": {
+            "success": { "type": "integer", "minimum": 0 },
+            "failed": { "type": "integer", "minimum": 0 },
+            "running": { "type": "integer", "minimum": 0 },
+            "pending": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "recent": { "type": "array", "items": { "type": "object" }, "description": "原样透传 A-core task_status 最近记录" },
+        "sourceRef": { "$ref": "#/$defs/sourceRefs" }
+      }
+    },
+    "insights": {
+      "type": "array",
+      "description": "AI 分析结论，每条也必须带依据",
+      "items": {
+        "type": "object",
+        "required": ["text", "sourceRef"],
+        "additionalProperties": false,
+        "properties": {
+          "text": { "type": "string" },
+          "sourceRef": { "$ref": "#/$defs/sourceRefs" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sourceRef": {
+      "type": "object",
+      "required": ["source", "pointer"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "type": "string", "description": "sources[].id" },
+        "pointer": { "type": "string", "pattern": "^(/.*)?$", "description": "RFC 6901 JSON Pointer，如 /items/3" },
+        "itemId": { "type": "string" }
+      }
+    },
+    "sourceRefs": { "type": "array", "items": { "$ref": "#/$defs/sourceRef" } },
+    "metric": {
+      "type": "object",
+      "required": ["value", "sourceRef"],
+      "additionalProperties": false,
+      "properties": {
+        "value": { "type": "number" },
+        "sourceRef": { "$ref": "#/$defs/sourceRefs" }
+      }
+    }
+  }
+}

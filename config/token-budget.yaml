@@ -1,0 +1,21 @@
+# Token 预算（单位：tokens；cost 单位 USD）
+# M2 起由 scheduler/budget.js 读取：超 warning 记 WARN，超 critical 暂停非发布类 pipeline。
+version: 1
+
+daily: 500000
+weekly: 3000000
+monthly: 10000000
+
+alertThresholds:
+  warning: 0.8
+  critical: 0.95
+
+# 单步 token 告警阈值（M2 起 executor 使用默认 100000；pipeline step 可用 tokenWarn 覆盖）
+stepWarnTokens: 100000
+
+stepLimits:
+  fetch-data: 5000
+  build-dashboard: 10000
+  recommend-themes: 50000
+  generate-script: 100000
+  create-animation: 200000

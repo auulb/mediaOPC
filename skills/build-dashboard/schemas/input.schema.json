@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "build-dashboard input",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "params": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rawItems": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "ledger": {
+          "type": "string"
+        },
+        "taskStatus": {
+          "type": "string"
+        },
+        "previousDashboard": {
+          "type": "string"
+        },
+        "dailyTokenBudget": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "topTopicCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        },
+        "topItemCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "dashboardDir": {
+          "type": "string"
+        },
+        "now": {
+          "type": "string",
+          "format": "date-time",
+          "description": "仅测试/固定 fixture 用：覆盖构建时间"
+        },
+        "upstream": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "上游 stepId 列表；rawItems 为空时按 workspace/{OPC_RUN_ID}/{stepId}/attempt-* 自动发现"
+        },
+        "runId": {
+          "type": "string",
+          "description": "缺省读 env OPC_RUN_ID"
+        }
+      }
+    }
+  }
+}

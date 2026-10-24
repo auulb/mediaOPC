@@ -1,0 +1,88 @@
+# OPC Pipeline 定义
+# M1/M2：scheduler/lib/pipeline.js 解析 depends_on DAG、input 模板与 output→input 拷贝。
+version: 1
+
+pipelines:
+  echo-smoke:
+    description: A-core M1 冒烟：正常单步，验证 run.sh、exit_code、output 校验、ledger
+    steps:
+      - id: echo
+        skill: echo
+        input: fixtures/echo/input.json
+        timeout: 120
+        retry:
+          maxAttempts: 3
+          baseDelayMs: 1000
+        tools: [read, write, bash]
+
+  echo-retry-smoke:
+    description: A-core M1 冒烟：前两次失败、第三次成功，3 个 attempt 目录都保留
+    steps:
+      - id: echo
+        skill: echo
+        input: fixtures/echo/input.fail-twice.json
+        timeout: 120
+        retry:
+          maxAttempts: 3
+          baseDelayMs: 1000
+        tools: [read, write, bash]
+
+  echo-chain:
+    description: A-core M2 冒烟：DAG + output→input 拷贝 + task_status
+    steps:
+      - id: first
+        skill: echo
+        input: fixtures/echo/input.json
+        timeout: 120
+      - id: second
+        skill: echo
+        depends_on: [first]
+        timeout: 120
+
+  echo-fail:
+    description: A-core M2 冒烟：前序失败 → 后续 skipped，run 失败
+    steps:
+      - id: bad
+        skill: echo
+        input: fixtures/echo/input.fail-twice.json
+        timeout: 120
+        retry:
+          maxAttempts: 1
+      - id: after
+        skill: echo
+        depends_on: [bad]
+        timeout: 120
+
+  trends-analysis:
+    description: M2 数据段端到端：B 站热门 + 自有数据 → dashboard → 6 个候选主题
+    steps:
+      - id: fetch-bilibili
+        skill: fetch-bilibili-hot
+        contract: raw-items
+        input: fixtures/fetch-bilibili-hot/input.json
+        timeout: 300
+        retry:
+          maxAttempts: 3
+          baseDelayMs: 2000
+      - id: fetch-internal
+        skill: fetch-internal-metrics
+        contract: raw-items
+        input: fixtures/fetch-internal-metrics/input.json
+        timeout: 300
+        retry:
+          maxAttempts: 3
+          baseDelayMs: 2000
+      - id: build-dashboard
+        skill: build-dashboard
+        contract: dashboard
+        depends_on: [fetch-bilibili, fetch-internal]
+        input: fixtures/build-dashboard/input.pipeline.json
+        timeout: 300
+      - id: recommend
+        skill: recommend-themes
+        contract: themes
+        depends_on: [build-dashboard]
+        timeout: 600
+        retry:
+          maxAttempts: 2
+          baseDelayMs: 2000

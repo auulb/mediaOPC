@@ -1,0 +1,28 @@
+{
+  "platform": "bilibili",
+  "uploadUrl": "https://member.bilibili.com/platform/upload/video/frame",
+  "limits": {
+    "maxDurationSec": 600,
+    "maxFileSizeBytes": 8589934592,
+    "minWidth": 720,
+    "minHeight": 480,
+    "maxTitleLength": 80,
+    "maxTags": 10,
+    "maxTagLength": 20,
+    "maxDescriptionLength": 2000
+  },
+  "login": {
+    "profileDir": "data/browser-profiles/bilibili",
+    "qrTimeoutSec": 300,
+    "loggedInCookie": "SESSDATA"
+  },
+  "selectors": {
+    "uploadInput": ["input[type=file]"],
+    "titleInput": ["input.input-val", "input[placeholder*=\"标题\"]"],
+    "descriptionEditor": [".ql-editor", "div[contenteditable=true]"],
+    "tagInput": ["input[placeholder*=\"标签\"]", "input[placeholder*=\"按回车\"]"],
+    "coverInput": ["input[type=file][accept*=image]"],
+    "submitButton": ["button:has-text(\"立即投稿\")", ".submit-add", "button[class*=submit]"],
+    "successMarker": [".success-title", "text=投稿成功"]
+  }
+}

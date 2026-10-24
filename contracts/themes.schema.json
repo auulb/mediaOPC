@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "opc/themes.schema.json",
+  "title": "Themes v1",
+  "description": "候选主题（设计文档 2.2 模块 3）。生产者 B-data(recommend-themes)，消费者 C-media(generate-script / create-*)。",
+  "type": "object",
+  "required": ["schemaVersion", "generatedAt", "dashboardRef", "themes"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "dashboardRef": { "type": "string", "description": "所依据的看板文件路径" },
+    "themes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/theme" }
+    }
+  },
+  "$defs": {
+    "theme": {
+      "type": "object",
+      "required": ["id", "title", "source", "confidence", "reason", "evidence", "targetPlatform", "estimatedCost", "creationPlan", "brief"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^theme_[A-Za-z0-9_]+$", "description": "推荐格式 theme_YYYYMMDD_NNN；兼容 theme_001" },
+        "title": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "enum": ["external", "internal"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "reason": { "type": "string", "minLength": 1 },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "description": "依据，指向看板中的位置",
+          "items": {
+            "type": "object",
+            "required": ["pointer"],
+            "additionalProperties": false,
+            "properties": {
+              "pointer": { "type": "string", "description": "看板文件内的 JSON Pointer，如 /externalTrends/topTopics/0" },
+              "note": { "type": "string" }
+            }
+          }
+        },
+        "targetPlatform": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "enum": ["bilibili", "youtube", "tiktok", "douyin"] }
+        },
+        "brief": {
+          "type": "object",
+          "description": "给 C-media 的创作简报",
+          "required": ["angle", "audience", "durationSec", "keywords"],
+          "additionalProperties": false,
+          "properties": {
+            "angle": { "type": "string", "description": "切入点 / 一句话看点" },
+            "audience": { "type": "string" },
+            "durationSec": { "type": "integer", "minimum": 5, "maximum": 1800 },
+            "keywords": { "type": "array", "items": { "type": "string" } },
+            "tone": { "type": "string" },
+            "references": { "type": "array", "items": { "type": "string" }, "description": "参考作品 url 或 id" }
+          }
+        },
+        "estimatedCost": {
+          "type": "object",
+          "required": ["tokens", "time", "budget"],
+          "additionalProperties": false,
+          "properties": {
+            "tokens": { "type": "integer", "minimum": 0 },
+            "time": { "type": "string", "description": "如 2小时" },
+            "budget": { "type": "string", "description": "如 $15，v1 为估算值" }
+          }
+        },
+        "creationPlan": {
+          "type": "object",
+          "required": ["steps"],
+          "additionalProperties": false,
+          "properties": {
+            "steps": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["step", "tool", "duration"],
+                "additionalProperties": false,
+                "properties": {
+                  "step": { "type": "string", "enum": ["script", "storyboard", "assets", "animation", "render", "publish"] },
+                  "tool": { "type": "string" },
+                  "duration": { "type": "string" },
+                  "notes": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

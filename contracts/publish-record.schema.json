@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "opc://contracts/publish-record.schema.json",
+  "title": "Publish Record (发布记录)",
+  "description": "C-media 发布步骤的产出，每个平台一条。producer: C (publish-*)；consumer: B (fetch-internal-metrics 用 platformVideoId + publishedAt 拉 24h/72h 数据)、A (任务状态)。",
+  "x-version": 1,
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "publishId", "themeId", "productionId", "platform", "status", "metadata", "precheck", "publishedAt", "url", "platformVideoId", "error"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "publishId": { "type": "string", "pattern": "^pub_[A-Za-z0-9_-]+$" },
+    "themeId": { "type": "string", "minLength": 1 },
+    "productionId": { "type": "string", "pattern": "^prod_[A-Za-z0-9_-]+$" },
+    "platform": { "enum": ["bilibili", "youtube", "douyin", "tiktok"] },
+    "status": {
+      "description": "published=已公开；submitted=已提交待平台审核；precheck_failed=预检未过、未上传；login_required=扫码超时等待人工；manual_fallback=自动化失败已降级人工（含 PUBLISH_DISABLED：预检通过但未启用真实投稿）；failed=其他失败",
+      "enum": ["published", "submitted", "precheck_failed", "login_required", "manual_fallback", "failed"]
+    },
+    "publishedAt": { "type": ["string", "null"], "format": "date-time" },
+    "url": { "type": ["string", "null"], "format": "uri" },
+    "platformVideoId": { "type": ["string", "null"], "description": "平台视频 ID，B站为 BV 号" },
+    "metadata": {
+      "description": "实际提交到平台的元数据（经平台规则裁剪后）",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description", "tags", "thumbnail"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "thumbnail": { "type": "string" }
+      }
+    },
+    "precheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "checks"],
+      "properties": {
+        "passed": { "type": "boolean" },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "passed"],
+            "properties": {
+              "name": { "enum": ["duration", "fileSize", "resolution", "sensitiveWords", "tagCount", "titleLength", "coverExists"] },
+              "passed": { "type": "boolean" },
+              "detail": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "initialMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "views": { "type": "integer", "minimum": 0 },
+        "likes": { "type": "integer", "minimum": 0 },
+        "comments": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "error": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "message"],
+          "properties": {
+            "code": { "enum": ["PRECHECK_FAILED", "LOGIN_TIMEOUT", "UPLOAD_FAILED", "SELECTOR_NOT_FOUND", "PLATFORM_REJECTED", "PUBLISH_DISABLED", "NETWORK_ERROR", "UNKNOWN"] },
+            "message": { "type": "string" },
+            "screenshot": { "type": "string", "description": "失败截图，相对仓库根目录" }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": { "required": ["status"], "properties": { "status": { "const": "published" } } },
+      "then": { "properties": { "publishedAt": { "type": "string" }, "url": { "type": "string" }, "platformVideoId": { "type": "string" }, "error": { "type": "null" } } }
+    },
+    {
+      "if": { "required": ["status"], "properties": { "status": { "const": "precheck_failed" } } },
+      "then": { "properties": { "precheck": { "properties": { "passed": { "const": false } } }, "error": { "type": "object" } } }
+    }
+  ]
+}

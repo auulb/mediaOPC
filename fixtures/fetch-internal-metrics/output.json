@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "dataSource": "internal-metrics",
+  "platform": "internal",
+  "timestamp": "2024-01-16T10:00:00Z",
+  "params": { "recordsJsonl": "fixtures/fetch-internal-metrics/publish_records.jsonl" },
+  "cache": {
+    "hit": false,
+    "key": "internal-metrics-7c1d2e3f4a5b",
+    "expiresAt": "2024-01-16T11:00:00Z"
+  },
+  "items": [
+    {
+      "id": "BV1xx411c7mD",
+      "title": "30秒看懂：AI 动画是怎么做出来的",
+      "url": "https://www.bilibili.com/video/BV1xx411c7mD",
+      "views": 52000,
+      "likes": 4100,
+      "comments": 260,
+      "shares": 180,
+      "favorites": 1300,
+      "tags": ["AI", "动画", "教程", "Remotion"],
+      "durationSec": 30,
+      "publishDate": "2024-01-15",
+      "publishedAt": "2024-01-15T18:03:41Z",
+      "channel": { "id": "1", "name": "self", "subscribers": null },
+      "metrics": { "engagement": 0.1123, "viewsPerHour": 3250.0, "velocity": "unknown" },
+      "internal": {
+        "publishId": "pub_20240115_bili_001",
+        "themeId": "theme_20240115_001",
+        "platform": "bilibili",
+        "window": "24h",
+        "hoursSincePublish": 16.0
+      }
+    },
+    {
+      "id": "BV1yy411c7mE",
+      "title": "Remotion 实战：30 秒动画从 0 到 1",
+      "url": "https://www.bilibili.com/video/BV1yy411c7mE",
+      "views": 12000,
+      "likes": 900,
+      "comments": 45,
+      "shares": 30,
+      "favorites": 210,
+      "tags": ["Remotion", "动画", "前端"],
+      "durationSec": 30,
+      "publishDate": "2024-01-12",
+      "publishedAt": "2024-01-12T19:00:00Z",
+      "channel": { "id": "1", "name": "self", "subscribers": null },
+      "metrics": { "engagement": 0.0988, "viewsPerHour": 116.5, "velocity": "unknown" },
+      "internal": {
+        "publishId": "pub_20240112_bili_002",
+        "themeId": "theme_20240112_001",
+        "platform": "bilibili",
+        "window": "72h",
+        "hoursSincePublish": 87.0
+      }
+    }
+  ],
+  "warnings": []
+}

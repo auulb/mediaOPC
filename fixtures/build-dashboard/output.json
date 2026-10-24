@@ -1,0 +1,373 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2024-01-16T10:00:00.000Z",
+  "sources": [
+    {
+      "id": "raw-0-bilibili-hot",
+      "file": "fixtures/fetch-bilibili-hot/output.json",
+      "kind": "raw-items",
+      "dataSource": "bilibili-hot",
+      "timestamp": "2024-01-15T10:00:00Z"
+    },
+    {
+      "id": "raw-1-internal-metrics",
+      "file": "fixtures/fetch-internal-metrics/output.json",
+      "kind": "raw-items",
+      "dataSource": "internal-metrics",
+      "timestamp": "2024-01-16T10:00:00Z"
+    },
+    {
+      "id": "token-ledger",
+      "file": "fixtures/token-ledger/token_ledger.jsonl",
+      "kind": "token-ledger"
+    },
+    {
+      "id": "task-status",
+      "file": "fixtures/build-dashboard/task_status.jsonl",
+      "kind": "task-status"
+    }
+  ],
+  "externalTrends": {
+    "topTopics": [
+      {
+        "topic": "动画",
+        "heat": 100,
+        "growth": "n/a",
+        "itemCount": 2,
+        "platforms": [
+          "bilibili"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/0",
+            "itemId": "BV1xx411c7mD"
+          },
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/1",
+            "itemId": "BV1yy411c7mE"
+          }
+        ]
+      },
+      {
+        "topic": "AI",
+        "heat": 83.3,
+        "growth": "n/a",
+        "itemCount": 2,
+        "platforms": [
+          "bilibili"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/0",
+            "itemId": "BV1xx411c7mD"
+          },
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/2",
+            "itemId": "BV1zz411c7mF"
+          }
+        ]
+      },
+      {
+        "topic": "教程",
+        "heat": 83.3,
+        "growth": "n/a",
+        "itemCount": 2,
+        "platforms": [
+          "bilibili"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/0",
+            "itemId": "BV1xx411c7mD"
+          },
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/2",
+            "itemId": "BV1zz411c7mF"
+          }
+        ]
+      },
+      {
+        "topic": "Remotion",
+        "heat": 33.3,
+        "growth": "n/a",
+        "itemCount": 1,
+        "platforms": [
+          "bilibili"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/1",
+            "itemId": "BV1yy411c7mE"
+          }
+        ]
+      },
+      {
+        "topic": "前端",
+        "heat": 33.3,
+        "growth": "n/a",
+        "itemCount": 1,
+        "platforms": [
+          "bilibili"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/1",
+            "itemId": "BV1yy411c7mE"
+          }
+        ]
+      },
+      {
+        "topic": "绘画",
+        "heat": 16.7,
+        "growth": "n/a",
+        "itemCount": 1,
+        "platforms": [
+          "bilibili"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/2",
+            "itemId": "BV1zz411c7mF"
+          }
+        ]
+      }
+    ],
+    "flowDirection": {
+      "bilibili": {
+        "value": 100,
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/0",
+            "itemId": "BV1xx411c7mD"
+          },
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/1",
+            "itemId": "BV1yy411c7mE"
+          },
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/2",
+            "itemId": "BV1zz411c7mF"
+          }
+        ]
+      }
+    },
+    "topItems": [
+      {
+        "id": "BV1xx411c7mD",
+        "title": "30秒看懂 AI 动画的生产链",
+        "platform": "bilibili",
+        "views": 1280000,
+        "engagement": 0.1027,
+        "velocity": "rising",
+        "tags": [
+          "AI",
+          "动画",
+          "教程"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/0",
+            "itemId": "BV1xx411c7mD"
+          }
+        ]
+      },
+      {
+        "id": "BV1yy411c7mE",
+        "title": "Remotion 实战：用 React 写一条 30 秒动画",
+        "platform": "bilibili",
+        "views": 640000,
+        "engagement": 0.0877,
+        "velocity": "stable",
+        "tags": [
+          "Remotion",
+          "动画",
+          "前端"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/1",
+            "itemId": "BV1yy411c7mE"
+          }
+        ]
+      },
+      {
+        "id": "BV1zz411c7mF",
+        "title": "AI 绘画工作流 2024 版",
+        "platform": "bilibili",
+        "views": 320000,
+        "engagement": 0.0978,
+        "velocity": "falling",
+        "tags": [
+          "AI",
+          "绘画",
+          "教程"
+        ],
+        "sourceRef": [
+          {
+            "source": "raw-0-bilibili-hot",
+            "pointer": "/items/2",
+            "itemId": "BV1zz411c7mF"
+          }
+        ]
+      }
+    ]
+  },
+  "internalPerformance": {
+    "episodes": [
+      {
+        "id": "pub_20240115_bili_001",
+        "themeId": "theme_20240115_001",
+        "title": "30秒看懂：AI 动画是怎么做出来的",
+        "platform": "bilibili",
+        "window": "24h",
+        "views": 52000,
+        "likes": 4100,
+        "comments": 260,
+        "engagement": 0.1123,
+        "tokensSpent": null,
+        "roi": null,
+        "sourceRef": [
+          {
+            "source": "raw-1-internal-metrics",
+            "pointer": "/items/0",
+            "itemId": "BV1xx411c7mD"
+          }
+        ]
+      },
+      {
+        "id": "pub_20240112_bili_002",
+        "themeId": "theme_20240112_001",
+        "title": "Remotion 实战：30 秒动画从 0 到 1",
+        "platform": "bilibili",
+        "window": "72h",
+        "views": 12000,
+        "likes": 900,
+        "comments": 45,
+        "engagement": 0.0988,
+        "tokensSpent": null,
+        "roi": null,
+        "sourceRef": [
+          {
+            "source": "raw-1-internal-metrics",
+            "pointer": "/items/1",
+            "itemId": "BV1yy411c7mE"
+          }
+        ]
+      }
+    ],
+    "avgEngagement": {
+      "value": 0.1056,
+      "sourceRef": [
+        {
+          "source": "raw-1-internal-metrics",
+          "pointer": "/items/0",
+          "itemId": "BV1xx411c7mD"
+        },
+        {
+          "source": "raw-1-internal-metrics",
+          "pointer": "/items/1",
+          "itemId": "BV1yy411c7mE"
+        }
+      ]
+    },
+    "topPerformers": [
+      "pub_20240115_bili_001",
+      "pub_20240112_bili_002"
+    ]
+  },
+  "tokenUsage": {
+    "today": 19600,
+    "thisWeek": 20600,
+    "costToday": 0.051,
+    "budget": 500000,
+    "utilizationRate": 0.0392,
+    "byStep": [
+      {
+        "stepId": "recommend",
+        "tokens": 15000,
+        "cost": 0.04
+      },
+      {
+        "stepId": "build-dashboard",
+        "tokens": 3400,
+        "cost": 0.008
+      },
+      {
+        "stepId": "fetch-bilibili",
+        "tokens": 2200,
+        "cost": 0.005
+      }
+    ],
+    "sourceRef": [
+      {
+        "source": "token-ledger",
+        "pointer": ""
+      }
+    ]
+  },
+  "taskStatus": {
+    "summary": {
+      "success": 4,
+      "failed": 0,
+      "running": 1,
+      "pending": 0
+    },
+    "recent": [
+      {
+        "runId": "20240116-100000-97a8",
+        "pipelineId": "content-creation",
+        "stepId": "render-remotion",
+        "status": "running",
+        "finishedAt": null
+      },
+      {
+        "runId": "20240116-090500-c3d4",
+        "pipelineId": "theme-recommendation",
+        "stepId": "recommend",
+        "status": "success",
+        "finishedAt": "2024-01-16T01:10:00Z"
+      },
+      {
+        "runId": "20240116-090000-a1b2",
+        "pipelineId": "trends-analysis",
+        "stepId": "build-dashboard",
+        "status": "success",
+        "finishedAt": "2024-01-16T01:05:00Z"
+      },
+      {
+        "runId": "20240116-090000-a1b2",
+        "pipelineId": "trends-analysis",
+        "stepId": "fetch-internal",
+        "status": "success",
+        "finishedAt": "2024-01-16T01:01:10Z"
+      },
+      {
+        "runId": "20240116-090000-a1b2",
+        "pipelineId": "trends-analysis",
+        "stepId": "fetch-bilibili",
+        "status": "success",
+        "finishedAt": "2024-01-16T01:00:05Z"
+      }
+    ],
+    "sourceRef": [
+      {
+        "source": "task-status",
+        "pointer": "/tasks"
+      }
+    ]
+  }
+}

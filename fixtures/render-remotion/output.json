@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "productionId": "prod_20240115_theme_001",
+  "themeId": "theme_001",
+  "createdAt": "2024-01-15T14:32:10Z",
+  "renderer": "remotion",
+  "template": "remotion/explainer-30s",
+  "video": {
+    "path": "data/productions/prod_20240115_theme_001/final.mp4",
+    "durationSec": 30,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "sizeBytes": 8421376,
+    "codec": "h264"
+  },
+  "cover": {
+    "path": "data/productions/prod_20240115_theme_001/cover.jpg",
+    "width": 1920,
+    "height": 1080
+  },
+  "script": {
+    "path": "data/productions/prod_20240115_theme_001/script.md",
+    "storyboardPath": "data/productions/prod_20240115_theme_001/storyboard.json"
+  },
+  "metadataDraft": {
+    "title": "30秒看懂：AI 动画是怎么做出来的",
+    "description": "从脚本到分镜到渲染，一条 AI 动画的完整生产链路。",
+    "tags": ["AI", "动画", "教程", "Remotion"],
+    "category": "科技"
+  },
+  "targetPlatforms": ["bilibili", "youtube"],
+  "sourceRef": {
+    "themesFile": "fixtures/recommend-themes/output.json",
+    "themeId": "theme_001"
+  }
+}

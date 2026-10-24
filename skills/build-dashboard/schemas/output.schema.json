@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "build-dashboard output",
+  "description": "平铺写出 dashboard v1，契约见 contracts/dashboard.schema.json。",
+  "$ref": "opc/dashboard.schema.json"
+}

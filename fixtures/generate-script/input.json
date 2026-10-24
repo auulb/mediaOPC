@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2024-01-15T10:05:00Z",
+  "dashboardRef": "dashboard/external_trends.json",
+  "themes": [
+    {
+      "id": "theme_001",
+      "title": "30秒看懂 AI 动画的生产链",
+      "source": "external",
+      "confidence": 0.86,
+      "reason": "站内 AI 动画类内容近 7 天热度上升，头部作品平均播放量高于均值 2.1 倍",
+      "evidence": [{ "pointer": "/externalTrends/topTopics/0", "note": "AI 动画话题热度 92" }],
+      "targetPlatform": ["bilibili", "youtube"],
+      "estimatedCost": { "tokens": 50000, "time": "2小时", "budget": "$15" },
+      "creationPlan": {
+        "steps": [
+          { "step": "script", "tool": "pi", "duration": "10分钟" },
+          { "step": "storyboard", "tool": "pi", "duration": "5分钟" },
+          { "step": "render", "tool": "remotion", "duration": "3分钟" }
+        ]
+      },
+      "brief": {
+        "angle": "把一条动画的完整生产链路压缩成 30 秒，突出自动化",
+        "audience": "对 AI 内容生产感兴趣的创作者",
+        "durationSec": 30,
+        "keywords": ["AI", "动画", "自动化", "Remotion"],
+        "tone": "干脆、信息密度高"
+      }
+    }
+  ]
+}

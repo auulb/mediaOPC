@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "status": "success",
+  "runId": "20240115-0900-a1b2",
+  "pipelineId": "trends-analysis",
+  "stepId": "recommend",
+  "skill": "recommend-themes",
+  "attempt": 1,
+  "startedAt": "2024-01-15T10:00:00Z",
+  "finishedAt": "2024-01-15T10:00:45Z",
+  "exitCode": 0,
+  "output": {
+    "path": "/Users/me/opc2/workspace/20240115-0900-a1b2/recommend/attempt-1/output.json",
+    "contract": "themes"
+  },
+  "artifacts": [
+    { "path": "data/themes.json", "kind": "json", "contract": "themes", "description": "候选主题" }
+  ],
+  "usage": { "totalTokens": 1500, "costUsd": 0.0123 },
+  "error": null
+}

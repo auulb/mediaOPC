@@ -1,0 +1,24 @@
+{
+  "name": "opc2",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "opc": "bin/opc"
+  },
+  "scripts": {
+    "test": "node --test scheduler/test/*.test.js plugins/data-sources/test/*.test.mjs skills/*/test/*.test.mjs plugins/publishers/test/*.test.mjs",
+    "test:core": "node --test scheduler/test/*.test.js",
+    "test:data": "node --test plugins/data-sources/test/*.test.mjs",
+    "test:skills": "node --test skills/*/test/*.test.mjs plugins/publishers/test/*.test.mjs",
+    "validate:fixtures": "node bin/opc validate-fixtures"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "yaml": "2.9.1"
+  }
+}

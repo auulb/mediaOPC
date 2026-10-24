@@ -1,0 +1,94 @@
+{
+  "generatedAt": "2026-10-24T09:45:46.145Z",
+  "sources": [
+    {
+      "id": "raw-0-bilibili-hot",
+      "file": "workspace/demo-trends-1/fetch-bilibili/attempt-1/output.json",
+      "kind": "raw-items",
+      "dataSource": "bilibili-hot",
+      "timestamp": "2026-10-24T09:26:30.983Z"
+    },
+    {
+      "id": "raw-1-internal-metrics",
+      "file": "workspace/demo-trends-1/fetch-internal/attempt-1/output.json",
+      "kind": "raw-items",
+      "dataSource": "internal-metrics",
+      "timestamp": "2026-10-24T09:33:36.431Z"
+    },
+    {
+      "id": "token-ledger",
+      "file": "data/token_ledger.jsonl",
+      "kind": "token-ledger"
+    },
+    {
+      "id": "task-status",
+      "file": "dashboard/task_status.json",
+      "kind": "task-status"
+    }
+  ],
+  "tokenUsage": {
+    "today": 988249,
+    "thisWeek": 988249,
+    "costToday": 0.006,
+    "budget": 500000,
+    "utilizationRate": 1.9765,
+    "byStep": [
+      {
+        "stepId": "publish-bilibili",
+        "tokens": 526091,
+        "cost": 0
+      },
+      {
+        "stepId": "fetch-internal",
+        "tokens": 176603,
+        "cost": 0
+      },
+      {
+        "stepId": "build-dashboard",
+        "tokens": 89645,
+        "cost": 0
+      },
+      {
+        "stepId": "recommend",
+        "tokens": 70591,
+        "cost": 0
+      },
+      {
+        "stepId": "generate-script",
+        "tokens": 53318,
+        "cost": 0
+      },
+      {
+        "stepId": "fetch-bilibili",
+        "tokens": 32106,
+        "cost": 0
+      },
+      {
+        "stepId": "echo",
+        "tokens": 20031,
+        "cost": 0
+      },
+      {
+        "stepId": "render-remotion",
+        "tokens": 11306,
+        "cost": 0
+      },
+      {
+        "stepId": "first",
+        "tokens": 5206,
+        "cost": 0.003
+      },
+      {
+        "stepId": "second",
+        "tokens": 3352,
+        "cost": 0.003
+      }
+    ],
+    "sourceRef": [
+      {
+        "source": "token-ledger",
+        "pointer": ""
+      }
+    ]
+  }
+}

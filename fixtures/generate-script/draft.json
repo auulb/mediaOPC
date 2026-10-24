@@ -1,0 +1,13 @@
+{
+  "title": "30秒看懂：AI 动画是怎么做出来的",
+  "description": "从选题、脚本、分镜到渲染，一条 AI 动画的完整生产链路，30 秒讲完。",
+  "tags": ["AI", "动画", "自动化", "Remotion"],
+  "palette": "midnight",
+  "scriptMarkdown": "# 30秒看懂：AI 动画是怎么做出来的\n\n（开场，0-5s）\n一条 AI 动画，从想法到成片需要多久？现在是 30 秒。\n\n（第一点，5-13s）\n第一步，数据选题。热门榜单加自有数据，先挑出值得做的题。\n\n（第二点，13-22s）\n第二步，AI 写脚本和分镜。结构化的分镜直接交给渲染器。\n\n（收尾，22-30s）\n第三步，一键发布。关注我，下期讲发布自动化。\n",
+  "scenes": [
+    { "kind": "title", "heading": "30秒看懂 AI 动画", "body": "从选题到成片", "durationSec": 5 },
+    { "kind": "point", "heading": "数据选题", "body": "热门榜单 + 自有数据，挑出值得做的题", "durationSec": 8 },
+    { "kind": "point", "heading": "AI 写脚本", "body": "分镜结构化，直接交给渲染器", "durationSec": 9 },
+    { "kind": "outro", "heading": "一键发布", "body": "关注我，下期讲发布自动化", "durationSec": 8 }
+  ]
+}

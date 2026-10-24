@@ -1,0 +1,5 @@
+{
+  "params": {
+    "recordsJsonl": "fixtures/fetch-internal-metrics/publish_records.jsonl"
+  }
+}

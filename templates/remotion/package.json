@@ -1,0 +1,23 @@
+{
+  "name": "opc-remotion-templates",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "C-media Remotion 模板。独立 package，不依赖根 package.json。",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render:sample": "node ../../skills/render-remotion/scripts/render.mjs --props fixtures/sample-props.json --out ../../data/productions/_sample"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.538",
+    "@remotion/cli": "4.0.538",
+    "@remotion/renderer": "4.0.538",
+    "react": "19.1.10",
+    "react-dom": "19.1.10",
+    "remotion": "4.0.538"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.17",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "publishId": "pub_20240115_bili_002",
+  "themeId": "theme_002",
+  "productionId": "prod_20240115_theme_002",
+  "platform": "bilibili",
+  "status": "precheck_failed",
+  "publishedAt": null,
+  "url": null,
+  "platformVideoId": null,
+  "metadata": {
+    "title": "示例：标签超限的视频",
+    "description": "",
+    "tags": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"],
+    "thumbnail": "data/productions/prod_20240115_theme_002/cover.jpg"
+  },
+  "precheck": {
+    "passed": false,
+    "checks": [
+      { "name": "duration", "passed": true, "detail": "30s" },
+      { "name": "tagCount", "passed": false, "detail": "12/10" }
+    ]
+  },
+  "error": { "code": "PRECHECK_FAILED", "message": "tagCount: 12 > 10" }
+}

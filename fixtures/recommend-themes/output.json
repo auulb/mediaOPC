@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2024-01-16T10:20:00Z",
+  "dashboardRef": "fixtures/recommend-themes/input.json",
+  "themes": [
+    {
+      "id": "theme_20240116_001",
+      "title": "30秒讲清 AI 动画生产链，为什么一条片子只要 2 小时",
+      "source": "external",
+      "confidence": 0.88,
+      "reason": "“动画”话题热度 100、覆盖 2 条热门；“AI”话题热度 83.3，头部作品播放量 128 万，且互动率 10.3% 高于均值。",
+      "evidence": [
+        { "pointer": "/externalTrends/topTopics/0", "note": "动画话题 heat=100、itemCount=2" },
+        { "pointer": "/externalTrends/topItems/0", "note": "128 万播放、互动率 10.27%、velocity=rising" }
+      ],
+      "targetPlatform": ["bilibili", "youtube"],
+      "brief": {
+        "angle": "用一条 30 秒片子把脚本→分镜→渲染的生产链压成可视化流水线",
+        "audience": "对 AI 内容生产感兴趣的创作者和小团队",
+        "durationSec": 30,
+        "keywords": ["AI", "动画", "生产链", "自动化", "Remotion"],
+        "tone": "信息密度高、节奏快",
+        "references": ["BV1xx411c7mD"]
+      },
+      "estimatedCost": { "tokens": 50000, "time": "2小时", "budget": "$15" },
+      "creationPlan": {
+        "steps": [
+          { "step": "script", "tool": "pi", "duration": "10分钟" },
+          { "step": "storyboard", "tool": "pi", "duration": "5分钟" },
+          { "step": "render", "tool": "remotion", "duration": "5分钟" }
+        ]
+      }
+    },
+    {
+      "id": "theme_20240116_002",
+      "title": "Remotion 实战：30 秒动画从 0 到 1",
+      "source": "external",
+      "confidence": 0.76,
+      "reason": "“Remotion”话题热度 33.3，相关作品 64 万播放、互动率 8.77%，属于供给少但需求明确的技术向选题。",
+      "evidence": [
+        { "pointer": "/externalTrends/topTopics/3", "note": "Remotion 话题 heat=33.3" },
+        { "pointer": "/externalTrends/topItems/1", "note": "64 万播放、互动率 8.77%" }
+      ],
+      "targetPlatform": ["bilibili"],
+      "brief": {
+        "angle": "只用一个固定模板，演示 React 组件如何变成可发布的动画",
+        "audience": "会一点前端、想尝试视频自动化的开发者",
+        "durationSec": 60,
+        "keywords": ["Remotion", "React", "动画", "前端"],
+        "tone": "教程、步骤清晰",
+        "references": ["BV1yy411c7mE"]
+      },
+      "estimatedCost": { "tokens": 60000, "time": "2小时", "budget": "$18" },
+      "creationPlan": {
+        "steps": [
+          { "step": "script", "tool": "pi", "duration": "12分钟" },
+          { "step": "storyboard", "tool": "pi", "duration": "6分钟" },
+          { "step": "render", "tool": "remotion", "duration": "8分钟" }
+        ]
+      }
+    },
+    {
+      "id": "theme_20240116_003",
+      "title": "AI 绘画工作流 2024：把 3 小时压到 20 分钟",
+      "source": "external",
+      "confidence": 0.64,
+      "reason": "“AI + 绘画”组合覆盖 32 万播放、互动率 9.78%，但 velocity=falling，适合用“效率提升”角度二次切入。",
+      "evidence": [
+        { "pointer": "/externalTrends/topTopics/1", "note": "AI 话题 heat=83.3" },
+        { "pointer": "/externalTrends/topItems/2", "note": "32 万播放、互动率 9.78%、velocity=falling" }
+      ],
+      "targetPlatform": ["bilibili", "douyin"],
+      "brief": {
+        "angle": "用同一条 prompt 对比 2023 与 2024 的绘画工作流耗时",
+        "audience": "插画师、设计从业者",
+        "durationSec": 45,
+        "keywords": ["AI 绘画", "工作流", "效率", "2024"],
+        "tone": "对比强烈、结论明确"
+      },
+      "estimatedCost": { "tokens": 45000, "time": "1.5小时", "budget": "$12" },
+      "creationPlan": {
+        "steps": [
+          { "step": "script", "tool": "pi", "duration": "8分钟" },
+          { "step": "storyboard", "tool": "pi", "duration": "4分钟" },
+          { "step": "render", "tool": "remotion", "duration": "4分钟" }
+        ]
+      }
+    },
+    {
+      "id": "theme_20240116_004",
+      "title": "把「AI 动画生产链」做成系列：第 2 集讲分镜",
+      "source": "internal",
+      "confidence": 0.91,
+      "reason": "自有作品 pub_20240115_bili_001 在 24h 窗口拿到 5.2 万播放、互动率 11.23%，是当前最高表现，值得直接做系列化。",
+      "evidence": [
+        { "pointer": "/internalPerformance/episodes/0", "note": "5.2 万播放、互动率 11.23%、24h 窗口" },
+        { "pointer": "/internalPerformance/topPerformers/0", "note": "进入 topPerformers" }
+      ],
+      "targetPlatform": ["bilibili", "youtube"],
+      "brief": {
+        "angle": "延续第 1 集的世界观，用同一套视觉语言拆解分镜环节",
+        "audience": "看过第 1 集、想了解制作细节的观众",
+        "durationSec": 30,
+        "keywords": ["AI", "动画", "分镜", "系列"],
+        "tone": "延续第 1 集风格",
+        "references": ["pub_20240115_bili_001"]
+      },
+      "estimatedCost": { "tokens": 55000, "time": "2小时", "budget": "$16" },
+      "creationPlan": {
+        "steps": [
+          { "step": "script", "tool": "pi", "duration": "10分钟" },
+          { "step": "storyboard", "tool": "pi", "duration": "5分钟" },
+          { "step": "render", "tool": "remotion", "duration": "5分钟" }
+        ]
+      }
+    },
+    {
+      "id": "theme_20240116_005",
+      "title": "重剪 Remotion 实战：前 3 秒先给结果",
+      "source": "internal",
+      "confidence": 0.72,
+      "reason": "pub_20240112_bili_002 在 72h 窗口只有 1.2 万播放，互动率 9.88% 不低，判断问题在开场留存而不是内容本身。",
+      "evidence": [
+        { "pointer": "/internalPerformance/episodes/1", "note": "1.2 万播放、互动率 9.88%、72h 窗口" },
+        { "pointer": "/internalPerformance/avgEngagement", "note": "平均互动率 0.1056，单条接近均值" }
+      ],
+      "targetPlatform": ["bilibili"],
+      "brief": {
+        "angle": "同素材重剪，把最终成片放在开头 3 秒，再倒叙制作过程",
+        "audience": "第一次刷到该内容的开发者",
+        "durationSec": 30,
+        "keywords": ["Remotion", "重剪", "开场", "留存"],
+        "tone": "先给结果、再讲过程"
+      },
+      "estimatedCost": { "tokens": 30000, "time": "1小时", "budget": "$9" },
+      "creationPlan": {
+        "steps": [
+          { "step": "script", "tool": "pi", "duration": "6分钟" },
+          { "step": "storyboard", "tool": "pi", "duration": "3分钟" },
+          { "step": "render", "tool": "remotion", "duration": "4分钟" }
+        ]
+      }
+    },
+    {
+      "id": "theme_20240116_006",
+      "title": "发布时段实验：18 点 vs 12 点，同一条片子两次发",
+      "source": "internal",
+      "confidence": 0.58,
+      "reason": "当前 token 日用量 19600/500000（3.92%），预算充足；两条已发布作品都集中在晚间，缺少同时段对照数据。",
+      "evidence": [
+        { "pointer": "/internalPerformance/episodes/0", "note": "18:03 发布，24h 5.2 万播放" },
+        { "pointer": "/internalPerformance/episodes/1", "note": "19:00 发布，72h 1.2 万播放" },
+        { "pointer": "/tokenUsage/utilizationRate", "note": "预算使用率 0.0392" }
+      ],
+      "targetPlatform": ["bilibili"],
+      "brief": {
+        "angle": "用同一条 30 秒片子在 12 点与 18 点各发一次，对比 24h 数据",
+        "audience": "运营者自身复盘，也可做成方法论内容",
+        "durationSec": 30,
+        "keywords": ["发布时段", "实验", "数据复盘", "运营"],
+        "tone": "实验记录、数据说话"
+      },
+      "estimatedCost": { "tokens": 20000, "time": "40分钟", "budget": "$6" },
+      "creationPlan": {
+        "steps": [
+          { "step": "script", "tool": "pi", "duration": "5分钟" },
+          { "step": "storyboard", "tool": "pi", "duration": "3分钟" },
+          { "step": "render", "tool": "remotion", "duration": "3分钟" }
+        ]
+      }
+    }
+  ]
+}

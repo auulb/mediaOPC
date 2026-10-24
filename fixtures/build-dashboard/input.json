@@ -1,0 +1,13 @@
+{
+  "params": {
+    "rawItems": [
+      "fixtures/fetch-bilibili-hot/output.json",
+      "fixtures/fetch-internal-metrics/output.json"
+    ],
+    "ledger": "fixtures/token-ledger/token_ledger.jsonl",
+    "taskStatus": "fixtures/build-dashboard/task_status.jsonl",
+    "dailyTokenBudget": 500000,
+    "now": "2024-01-16T10:00:00Z",
+    "dashboardDir": "data/fixture-dashboard"
+  }
+}

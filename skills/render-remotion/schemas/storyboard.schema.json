@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "opc://skills/render-remotion/storyboard.schema.json",
+  "title": "Storyboard for remotion/explainer-30s (= Remotion inputProps)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["theme", "scenes"],
+  "properties": {
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary", "background", "text"],
+      "properties": {
+        "primary": { "$ref": "#/$defs/color" },
+        "background": { "$ref": "#/$defs/color" },
+        "text": { "$ref": "#/$defs/color" }
+      }
+    },
+    "scenes": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "heading", "durationSec"],
+        "properties": {
+          "kind": { "enum": ["title", "point", "outro"] },
+          "heading": { "type": "string", "minLength": 1, "maxLength": 24 },
+          "body": { "type": "string", "maxLength": 60 },
+          "durationSec": { "type": "number", "minimum": 2, "maximum": 20 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" }
+  }
+}

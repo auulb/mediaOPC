@@ -1,0 +1,27 @@
+# OPC 定时任务配置
+# 由 scheduler/lib/cron.js 解析（标准 5 段 cron，本地时区）；enabled: true 才会触发。
+# enabled 默认 false，避免 A 的实现没稳定前误触发别人的 pipeline。
+version: 1
+
+schedules:
+  - name: echo-smoke-daily
+    cron: "0 9 * * *"
+    pipeline: echo-smoke
+    enabled: false
+
+  - name: daily-trends-analysis
+    cron: "0 9 * * *"
+    pipeline: trends-analysis
+    enabled: false
+
+  # M3 再启用：
+  # - name: publish-video
+  #   cron: "0 18 * * *"
+  #   pipeline: publish-video
+  #   enabled: false
+  #   manual_approval: true
+
+  - name: echo-chain-daily
+    cron: "0 9 * * *"
+    pipeline: echo-chain
+    enabled: false

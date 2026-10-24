@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "opc://skills/generate-script/input.schema.json",
+  "title": "generate-script input",
+  "description": "上游 recommend-themes 的 output.json 原样拷贝过来（符合 contracts/themes.schema.json v1）。也接受包在 step-envelope 里的形式（取 data）。",
+  "$ref": "opc/themes.schema.json"
+}

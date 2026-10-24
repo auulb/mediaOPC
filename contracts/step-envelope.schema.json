@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "opc://contracts/step-envelope.schema.json",
+  "title": "StepEnvelope",
+  "description": "v1 · Owner: A-core · 由调度器写入 workspace/{runId}/{stepId}/attempt-{n}/envelope.json，skill 不需要写。skill 只把业务数据（符合各自契约，如 production / publish-record）平铺写到 ./output.json；可选写 ./artifacts.json（数组，结构同下方 artifacts[]）和 ./error.json（结构同下方 error，用于主动声明业务失败及是否可重试）。",
+  "x-version": 1,
+  "type": "object",
+  "required": ["schemaVersion", "status", "runId", "pipelineId", "stepId", "skill", "attempt", "startedAt", "finishedAt", "exitCode", "output", "artifacts", "error"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "status": { "enum": ["success", "failed"], "description": "success = 退出码 0 且 output.json 通过契约校验且无 error.json" },
+    "runId": { "$ref": "#/$defs/id" },
+    "pipelineId": { "$ref": "#/$defs/id", "description": "单步手动运行时为 adhoc" },
+    "stepId": { "$ref": "#/$defs/id" },
+    "skill": { "$ref": "#/$defs/id" },
+    "attempt": { "type": "integer", "minimum": 1 },
+    "startedAt": { "type": "string", "format": "date-time" },
+    "finishedAt": { "type": "string", "format": "date-time" },
+    "exitCode": { "type": ["integer", "null"], "description": "pi 进程退出码；超时或未启动时为 null" },
+    "output": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["path"],
+          "additionalProperties": false,
+          "properties": {
+            "path": { "type": "string", "description": "output.json 绝对路径" },
+            "contract": { "type": ["string", "null"], "pattern": "^[a-z0-9-]+$", "description": "校验所用契约名 contracts/<contract>.schema.json" }
+          }
+        }
+      ]
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "kind"],
+        "additionalProperties": false,
+        "properties": {
+          "path": { "type": "string", "minLength": 1, "description": "相对仓库根目录，或绝对路径" },
+          "kind": { "type": "string", "minLength": 1, "description": "json / video / image / audio / markdown / log ..." },
+          "contract": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "required": ["totalTokens", "costUsd"],
+      "additionalProperties": false,
+      "properties": {
+        "totalTokens": { "type": "integer", "minimum": 0 },
+        "costUsd": { "type": "number", "minimum": 0 }
+      }
+    },
+    "error": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["code", "message"],
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "description": "调度器保留码：TIMEOUT NETWORK_ERROR API_RATE_LIMIT OUTPUT_MISSING OUTPUT_INVALID NONZERO_EXIT LAUNCH_FAILED。skill 可在 error.json 中使用自定义码（如 PRECHECK_FAILED）"
+            },
+            "message": { "type": "string" },
+            "retryable": { "type": "boolean", "description": "缺省时：保留码可重试，其他码不重试" },
+            "details": { "type": "object" }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "success" } } },
+      "then": { "properties": { "error": { "type": "null" }, "output": { "type": "object" } } }
+    },
+    {
+      "if": { "properties": { "status": { "const": "failed" } } },
+      "then": { "properties": { "error": { "type": "object" } } }
+    }
+  ],
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$" }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "opc/raw-items.schema.json",
+  "title": "RawItems v1",
+  "description": "数据源插件统一输出（设计文档 2.2 模块 1）。生产者 B-data，消费者 B-data(build-dashboard)。",
+  "type": "object",
+  "required": ["schemaVersion", "dataSource", "timestamp", "items"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "dataSource": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "插件 id，如 bilibili-hot、internal-metrics、youtube-trends"
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["bilibili", "youtube", "tiktok", "douyin", "internal"],
+      "description": "数据所属平台"
+    },
+    "timestamp": { "type": "string", "format": "date-time", "description": "数据快照时间（缓存命中时为原始抓取时间）" },
+    "params": { "type": "object", "description": "本次抓取参数，原样回显" },
+    "cache": {
+      "type": "object",
+      "required": ["hit", "key"],
+      "additionalProperties": false,
+      "properties": {
+        "hit": { "type": "boolean" },
+        "key": { "type": "string" },
+        "expiresAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "items": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "required": ["id", "title", "views", "likes", "comments", "tags", "publishDate", "channel", "metrics"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "description": "平台内唯一 id，如 B 站 bvid" },
+        "title": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "views": { "type": "integer", "minimum": 0 },
+        "likes": { "type": "integer", "minimum": 0 },
+        "comments": { "type": "integer", "minimum": 0 },
+        "shares": { "type": "integer", "minimum": 0 },
+        "favorites": { "type": "integer", "minimum": 0 },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "category": { "type": "string" },
+        "durationSec": { "type": "integer", "minimum": 0 },
+        "publishDate": { "type": "string", "format": "date" },
+        "publishedAt": { "type": "string", "format": "date-time" },
+        "channel": {
+          "type": "object",
+          "required": ["name"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "type": "string" },
+            "name": { "type": "string" },
+            "subscribers": { "type": ["integer", "null"], "minimum": 0, "description": "接口未返回时为 null" }
+          }
+        },
+        "metrics": {
+          "type": "object",
+          "required": ["engagement", "velocity"],
+          "additionalProperties": false,
+          "properties": {
+            "engagement": { "type": "number", "minimum": 0, "description": "(likes+comments+shares+favorites)/views，views=0 时为 0" },
+            "viewsPerHour": { "type": "number", "minimum": 0 },
+            "velocity": { "type": "string", "enum": ["rising", "stable", "falling", "unknown"] }
+          }
+        },
+        "internal": {
+          "type": "object",
+          "description": "仅 internal-metrics 输出：关联到 publish-record",
+          "required": ["publishId", "window"],
+          "additionalProperties": false,
+          "properties": {
+            "publishId": { "type": "string" },
+            "themeId": { "type": "string" },
+            "platform": { "type": "string" },
+            "window": { "type": "string", "enum": ["0h", "24h", "72h", "7d", "latest"], "description": "距发布时长所落区间" },
+            "hoursSincePublish": { "type": "number", "minimum": 0 }
+          }
+        }
+      }
+    }
+  }
+}

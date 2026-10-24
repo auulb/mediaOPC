@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "fetch-bilibili-hot output",
+  "description": "平铺写出 raw-items v1。$ref 使用 contracts/raw-items.schema.json 的 $id，便于调度器用已注册契约直接解析。",
+  "$ref": "opc/raw-items.schema.json"
+}

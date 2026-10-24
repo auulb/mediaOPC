@@ -1,0 +1,9 @@
+{
+  "theme": { "primary": "#FF4D6D", "background": "#0F1020", "text": "#FFFFFF" },
+  "scenes": [
+    { "kind": "title", "heading": "30秒看懂 AI 动画", "body": "从选题到成片", "durationSec": 5 },
+    { "kind": "point", "heading": "数据选题", "body": "热门榜单 + 自有数据，挑出值得做的题", "durationSec": 8 },
+    { "kind": "point", "heading": "AI 写脚本", "body": "脚本与分镜一次生成，结构化交给渲染器", "durationSec": 9 },
+    { "kind": "outro", "heading": "一键发布", "body": "关注我，下期讲发布自动化", "durationSec": 8 }
+  ]
+}

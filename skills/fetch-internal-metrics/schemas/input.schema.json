@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "fetch-internal-metrics input",
+  "description": "参数放在 params 中；也接受 step-envelope（取 data.params）。",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "params": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "recordFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "recordsJsonl": {
+          "type": "string"
+        },
+        "noCache": {
+          "type": "boolean",
+          "default": false
+        },
+        "cacheTtlSec": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "snapshotsJsonl": {
+          "type": "string",
+          "description": "快照 JSONL 路径，默认 data/internal_metrics_snapshots.jsonl"
+        },
+        "snapshot": {
+          "type": "boolean",
+          "default": true,
+          "description": "false 时不写快照（测试用）"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "echo output",
+  "type": "object",
+  "required": ["message", "attempt", "echoedAt"],
+  "properties": {
+    "message": { "type": "string" },
+    "attempt": { "type": "integer", "minimum": 1 },
+    "echoedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,13 @@
+{
+  "name": "opc-publishers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "C-media 发布器插件。独立 package，不依赖根 package.json。",
+  "scripts": {
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "playwright": "1.56.1"
+  }
+}

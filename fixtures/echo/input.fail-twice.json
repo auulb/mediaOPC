@@ -1,0 +1,4 @@
+{
+  "message": "retry smoke",
+  "failUntilAttempt": 3
+}

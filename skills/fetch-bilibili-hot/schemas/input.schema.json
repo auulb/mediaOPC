@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "fetch-bilibili-hot input",
+  "description": "参数放在 params 中；也接受 step-envelope（取 data.params）。全部可选。",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "params": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 },
+        "noCache": { "type": "boolean", "default": false },
+        "cacheTtlSec": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "status": "failed",
+  "runId": "20240115-0900-a1b2",
+  "pipelineId": "trends-analysis",
+  "stepId": "recommend",
+  "skill": "recommend-themes",
+  "attempt": 1,
+  "startedAt": "2024-01-15T10:00:00Z",
+  "finishedAt": "2024-01-15T10:00:45Z",
+  "exitCode": 1,
+  "output": null,
+  "artifacts": [],
+  "usage": { "totalTokens": 900, "costUsd": 0.008 },
+  "error": {
+    "code": "NONZERO_EXIT",
+    "message": "pi 退出码 1，见 stderr.log"
+  }
+}

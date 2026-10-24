@@ -1,0 +1,10 @@
+node_modules/
+workspace/
+logs/
+data/
+.DS_Store
+.env
+dashboard/task_status.json
+.webui.pid
+.playwright-mcp/
+p*.md

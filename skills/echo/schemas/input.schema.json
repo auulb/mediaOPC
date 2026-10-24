@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "echo input",
+  "type": "object",
+  "properties": {
+    "message": { "type": "string" },
+    "failUntilAttempt": { "type": "integer", "minimum": 0, "description": "OPC_ATTEMPT 小于该值时故意失败" },
+    "businessError": { "type": "boolean", "description": "为 true 时写 error.json 并正常退出" },
+    "sleepMs": { "type": "integer", "minimum": 0, "description": "执行前等待毫秒数，用于超时测试" }
+  },
+  "additionalProperties": false
+}

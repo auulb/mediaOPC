@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "ts": "2024-01-16T01:00:00Z",
+  "runId": "20240116-090000-a1b2",
+  "pipelineId": "trends-analysis",
+  "stepId": "fetch-bilibili",
+  "skill": "fetch-bilibili-hot",
+  "attempt": 1,
+  "outcome": "success",
+  "provider": "example",
+  "model": "example-model",
+  "input": 800,
+  "output": 400,
+  "cacheRead": 0,
+  "cacheWrite": 0,
+  "totalTokens": 1200,
+  "costUsd": 0.003,
+  "durationMs": 4200,
+  "messages": 3
+}

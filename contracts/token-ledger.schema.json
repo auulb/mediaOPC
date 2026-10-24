@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "opc://contracts/token-ledger.schema.json",
+  "title": "TokenLedgerEntry",
+  "description": "v1 · Owner: A-core · data/token_ledger.jsonl 的每一行。每个 attempt 一行（失败的 attempt 也记账）。消费者：B-data build-dashboard（看板 2.3）。",
+  "type": "object",
+  "required": [
+    "schemaVersion", "ts", "runId", "pipelineId", "stepId", "skill", "attempt", "outcome",
+    "input", "output", "cacheRead", "cacheWrite", "totalTokens", "costUsd", "durationMs"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "ts": { "type": "string", "format": "date-time", "description": "attempt 结束时间" },
+    "runId": { "type": "string", "minLength": 1 },
+    "pipelineId": { "type": "string", "minLength": 1, "description": "单步手动运行时为 \"adhoc\"" },
+    "stepId": { "type": "string", "minLength": 1 },
+    "skill": { "type": "string", "minLength": 1 },
+    "attempt": { "type": "integer", "minimum": 1 },
+    "outcome": { "enum": ["success", "failed"] },
+    "provider": { "type": ["string", "null"] },
+    "model": { "type": ["string", "null"] },
+    "input": { "type": "integer", "minimum": 0 },
+    "output": { "type": "integer", "minimum": 0 },
+    "cacheRead": { "type": "integer", "minimum": 0 },
+    "cacheWrite": { "type": "integer", "minimum": 0 },
+    "totalTokens": { "type": "integer", "minimum": 0 },
+    "costUsd": { "type": "number", "minimum": 0 },
+    "durationMs": { "type": "integer", "minimum": 0 },
+    "messages": { "type": "integer", "minimum": 0, "description": "统计到的 assistant 消息数" }
+  }
+}

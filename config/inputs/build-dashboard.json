@@ -1,0 +1,8 @@
+{
+  "params": {
+    "upstream": ["fetch-bilibili", "fetch-internal"],
+    "ledger": "data/token_ledger.jsonl",
+    "taskStatus": "dashboard/task_status.json",
+    "dailyTokenBudget": 500000
+  }
+}

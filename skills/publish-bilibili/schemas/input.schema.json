@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "opc://skills/publish-bilibili/input.schema.json",
+  "title": "publish-bilibili input (= production 成片清单)",
+  "$ref": "opc://contracts/production.schema.json"
+}

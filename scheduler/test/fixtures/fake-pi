@@ -1,0 +1,42 @@
+#!/usr/bin/env node
+// 假 pi：只给 scheduler 测试用。模拟 `pi -p --mode json --no-session -ns --skill <dir> ...`
+// 真实 pi 会把模型的事件流写到 stdout；这里执行 skill 的 echo 脚本，并输出一条带 usage 的 message_end。
+import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const args = process.argv.slice(2);
+const i = args.indexOf('--skill');
+const skillDir = i >= 0 ? args[i + 1] : null;
+if (!skillDir) {
+  console.error('fake-pi: 缺少 --skill');
+  process.exit(2);
+}
+const script = path.join(skillDir, 'scripts', 'echo.mjs');
+if (!fs.existsSync(script)) {
+  console.error(`fake-pi: 找不到 ${script}`);
+  process.exit(2);
+}
+
+const res = spawnSync(process.execPath, [script], { cwd: process.cwd(), env: process.env, encoding: 'utf8' });
+if (res.stdout) process.stderr.write(res.stdout);
+if (res.stderr) process.stderr.write(res.stderr);
+
+const totalTokens = 10;
+console.log(JSON.stringify({
+  type: 'message_end',
+  message: {
+    role: 'assistant',
+    provider: 'fake',
+    model: 'fake-pi-1',
+    usage: {
+      input: 6,
+      output: 4,
+      cacheRead: 0,
+      cacheWrite: 0,
+      totalTokens,
+      cost: { input: 0.0004, output: 0.0006, cacheRead: 0, cacheWrite: 0, total: 0.001 },
+    },
+  },
+}));
+process.exit(res.status ?? 1);
