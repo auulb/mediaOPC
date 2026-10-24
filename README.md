@@ -8,3 +8,9 @@
 - 本地运行：`git clone` 后 `./webui/start.sh` → http://127.0.0.1:4180
 
 重新生成：`node webui/build-static.mjs`
+
+## 在线地址
+
+- Vercel: https://mediaopc.vercel.app
+- GitHub Pages: https://auulb.github.io/mediaOPC/
+
