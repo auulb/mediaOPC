@@ -2,6 +2,8 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
+import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -10,11 +12,21 @@ const ROOT = path.resolve(HERE, '../..');
 const PORT = 4300 + Math.floor(Math.random() * 500);
 const BASE = `http://127.0.0.1:${PORT}`;
 let child;
+let tmp;
 
 before(async () => {
+  // 定时/采集状态写到临时目录，测试不污染仓库 data/
+  tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'opc-webui-'));
   child = spawn(process.execPath, ['webui/server.mjs'], {
     cwd: ROOT,
-    env: { ...process.env, OPC_WEB_PORT: String(PORT), OPC_WEB_NO_OPEN: '1' },
+    env: {
+      ...process.env,
+      OPC_WEB_PORT: String(PORT),
+      OPC_WEB_NO_OPEN: '1',
+      OPC_SCHED_DIR: path.join(tmp, 'schedule'),
+      OPC_SOURCES_DIR: path.join(tmp, 'sources'),
+      OPC_COOKIE_FILE: path.join(tmp, 'cookie.txt'),
+    },
     stdio: 'ignore',
   });
   for (let i = 0; i < 60; i++) {
@@ -27,7 +39,10 @@ before(async () => {
   throw new Error('服务器没起来');
 });
 
-after(() => { try { child.kill(); } catch {} });
+after(async () => {
+  try { child.kill(); } catch {}
+  if (tmp) await fs.rm(tmp, { recursive: true, force: true });
+});
 
 test('首页与静态资源可访问', async () => {
   for (const p of ['/', '/app.js', '/style.css']) {
@@ -132,4 +147,77 @@ test('POST /api/create/render 没有稿子时 404', async () => {
     body: JSON.stringify({ runId: 'no-such-run' }),
   });
   assert.equal(r.status, 404);
+});
+
+test('数据接口：Cookie 必须手动写入，且接口永不回显原文', async () => {
+  let st = await (await fetch(`${BASE}/api/cookie`)).json();
+  assert.equal(st.configured, false);
+  assert.equal(st.manualOnly, true);
+
+  // 缺 SESSDATA → 400，不落盘
+  const bad = await fetch(`${BASE}/api/cookie`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ cookie: 'bili_jct=zzz' }),
+  });
+  assert.equal(bad.status, 400);
+  assert.equal((await (await fetch(`${BASE}/api/cookie`)).json()).configured, false);
+
+  const ok = await fetch(`${BASE}/api/cookie`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ cookie: 'Cookie: SESSDATA=secret-value; bili_jct=zzz;' }),
+  });
+  assert.equal(ok.status, 200);
+  const d = await ok.json();
+  assert.equal(d.configured, true);
+  assert.equal(d.hasSessdata, true);
+  assert.ok(!JSON.stringify(d).includes('secret-value'), '接口不能返回 Cookie 原文');
+
+  // /api/data 里也不能出现 Cookie 原文；/media 读不到
+  const data = await (await fetch(`${BASE}/api/data`)).json();
+  assert.ok(!JSON.stringify(data).includes('secret-value'));
+  const media = await fetch(`${BASE}/media?p=data/secrets/bilibili-cookie.txt`);
+  assert.equal(media.status, 403);
+
+  await fetch(`${BASE}/api/cookie`, { method: 'DELETE' });
+  st = await (await fetch(`${BASE}/api/cookie`)).json();
+  assert.equal(st.configured, false);
+});
+
+test('定时定点：默认任务存在，保存会规范化时间点/星期，且只用确定性脚本', async () => {
+  const s = await (await fetch(`${BASE}/api/schedule`)).json();
+  assert.equal(s.aiFree, true);
+  assert.equal(s.server.mode, 'no-ai');
+  assert.equal(s.job.id, 'knowledge-latest');
+  assert.ok(Array.isArray(s.zones) && s.zones.some((z) => z.tid === 36));
+  assert.ok(s.script.includes('fetch-bilibili-knowledge'));
+  assert.equal(s.job.params.tid, 36);
+
+  const r = await fetch(`${BASE}/api/schedule`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      job: {
+        id: 'knowledge-latest',
+        enabled: true,
+        times: ['25:99', '08:30', '08:30', '19:05'],
+        days: [1, 2, 9, 2],
+        params: { tid: 201, limit: 999, enrich: false, keywords: ['AI', 'ai', '  '] },
+      },
+    }),
+  });
+  assert.equal(r.status, 200);
+  const d = await r.json();
+  assert.deepEqual(d.job.times, ['08:30', '19:05']);
+  assert.deepEqual(d.job.days, [1, 2]);
+  assert.equal(d.job.params.tid, 201);
+  assert.equal(d.job.params.limit, 50);
+  assert.equal(d.job.params.enrich, false);
+  assert.deepEqual(d.job.params.keywords, ['AI', 'ai']);
+  assert.ok(d.job.nextRunAt, '启用后应算出下次执行时间');
+
+  // 落盘再读，保持一致
+  const again = await (await fetch(`${BASE}/api/schedule`)).json();
+  assert.deepEqual(again.job.times, ['08:30', '19:05']);
 });

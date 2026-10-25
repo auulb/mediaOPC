@@ -10,9 +10,10 @@
     "opc": "bin/opc"
   },
   "scripts": {
-    "test": "node --test scheduler/test/*.test.js plugins/data-sources/test/*.test.mjs skills/*/test/*.test.mjs plugins/publishers/test/*.test.mjs",
+    "test": "node --test scheduler/test/*.test.js plugins/data-sources/test/*.test.mjs skills/*/test/*.test.mjs plugins/publishers/test/*.test.mjs webui/test/*.test.mjs",
     "test:core": "node --test scheduler/test/*.test.js",
     "test:data": "node --test plugins/data-sources/test/*.test.mjs",
+    "test:webui": "node --test webui/test/*.test.mjs",
     "test:skills": "node --test skills/*/test/*.test.mjs plugins/publishers/test/*.test.mjs",
     "validate:fixtures": "node bin/opc validate-fixtures"
   },

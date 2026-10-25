@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "dataSource": "bilibili-knowledge",
+  "platform": "bilibili",
+  "timestamp": "2026-10-24T19:42:42.935Z",
+  "params": {
+    "tid": 36,
+    "limit": 3,
+    "enrich": true
+  },
+  "cache": {
+    "hit": false,
+    "key": "bilibili-knowledge-6bcd03cc4180",
+    "expiresAt": "2026-10-24T19:47:42.935Z"
+  },
+  "items": [
+    {
+      "id": "BV1M3Hg6wE3b",
+      "title": "实验1项目策划方案初设",
+      "url": "https://www.bilibili.com/video/BV1M3Hg6wE3b",
+      "views": 0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "favorites": 0,
+      "tags": [
+        "知识（全部）",
+        "校园学习",
+        "回合制策略游戏"
+      ],
+      "category": "校园学习",
+      "durationSec": 4288,
+      "publishDate": "2026-10-24",
+      "publishedAt": "2026-10-24T19:42:20Z",
+      "channel": {
+        "id": "105056197",
+        "name": "水水水__",
+        "subscribers": null
+      },
+      "metrics": {
+        "engagement": 0,
+        "viewsPerHour": 0,
+        "velocity": "unknown"
+      }
+    },
+    {
+      "id": "BV1K3Hg6wEoP",
+      "title": "股票，是怎么被发明出来的？一颗肉豆蔻，和阿姆斯特丹的第一批股东｜No.001",
+      "url": "https://www.bilibili.com/video/BV1K3Hg6wEoP",
+      "views": 0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "favorites": 0,
+      "tags": [
+        "知识（全部）",
+        "财经商业",
+        "商业财经"
+      ],
+      "category": "财经商业",
+      "durationSec": 807,
+      "publishDate": "2026-10-24",
+      "publishedAt": "2026-10-24T19:41:08Z",
+      "channel": {
+        "id": "3747574729148708",
+        "name": "CATFISH猫鱼说",
+        "subscribers": null
+      },
+      "metrics": {
+        "engagement": 0,
+        "viewsPerHour": 0,
+        "velocity": "unknown"
+      }
+    },
+    {
+      "id": "BV1T3Hg6wExD",
+      "title": "2026-10-11-02-42-31",
+      "url": "https://www.bilibili.com/video/BV1T3Hg6wExD",
+      "views": 0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "favorites": 0,
+      "tags": [
+        "知识（全部）",
+        "校园学习",
+        "网文解读"
+      ],
+      "category": "校园学习",
+      "durationSec": 3407,
+      "publishDate": "2026-10-24",
+      "publishedAt": "2026-10-24T19:41:08Z",
+      "channel": {
+        "id": "3690977720011111",
+        "name": "bili_76359946781",
+        "subscribers": null
+      },
+      "metrics": {
+        "engagement": 0,
+        "viewsPerHour": 0,
+        "velocity": "unknown"
+      }
+    }
+  ]
+}

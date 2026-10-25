@@ -84,6 +84,9 @@ const state = {
   running: null,
   create: { stage: 'idle', themeId: '', themesPath: 'data/themes/latest.json', runId: null, draft: null, production: null },
   publish: { runId: null, record: null, busy: false },
+  schedule: null,
+  knowledge: { tid: 36, limit: 20, enrich: true, keywords: '', running: false, result: null, newTime: '' },
+  hot: { running: false, result: null },
 };
 
 let cdTimer = null;
@@ -102,6 +105,7 @@ const SNAPSHOT = {
   '/api/topics': 'static-data/topics.json',
   '/api/productions': 'static-data/productions.json',
   '/api/bootstrap': 'static-data/bootstrap.json',
+  '/api/schedule': 'static-data/schedule.json',
 };
 
 async function api(p, opts = {}) {
@@ -149,17 +153,19 @@ function dialog({ title, bodyHtml, okText = '确认', requireText = null }) {
 
 // ---------- 数据加载 ----------
 async function loadAll({ quiet = false } = {}) {
-  const [data, topics, prods, boot] = await Promise.all([
+  const [data, topics, prods, boot, sched] = await Promise.all([
     api('/api/data').catch(() => null),
     api('/api/topics').catch(() => null),
     api('/api/productions').catch(() => ({ productions: [] })),
     api('/api/bootstrap').catch(() => ({ pipelines: [] })),
+    api('/api/schedule').catch(() => null),
   ]);
   state.data = data;
   state.topics = topics;
   state.productions = prods.productions || [];
   state.pipelines = boot.pipelines || [];
   state.running = boot.active || null;
+  if (sched) state.schedule = sched;
   if (!quiet) render();
 }
 
@@ -189,6 +195,8 @@ function renderSources() {
     .join(' ');
   const srcCards = s.sources.map((src) => {
     const isInternal = /internal/.test(src.dataSource) || src.kind === 'internal-metrics';
+    const isKnowledge = /knowledge/.test(src.dataSource);
+    const label = isInternal ? '🪞 内部数据' : isKnowledge ? '📚 知识区最新' : '🌐 外部热门';
     const rows = src.items.map((i) => `
       <tr>
         <td class="wrap"><a href="${esc(i.url || '#')}" target="_blank" rel="noreferrer">${esc(i.title)}</a>
@@ -204,7 +212,7 @@ function renderSources() {
     return `
       <div class="card src-card">
         <div class="src-head">
-          <span class="name">${isInternal ? '🪞 内部数据' : '🌐 外部热门'}</span>
+          <span class="name">${label}</span>
           ${pill(src.dataSource, isInternal ? 'blue' : '')}
           ${pill(`${src.count} 条样本`)}
           <span class="meta">抓取 ${stamp(src.timestamp)} · ${esc(src.file)}</span>
@@ -220,13 +228,16 @@ function renderSources() {
   }).join('');
 
   el.innerHTML = `
-    ${head('数据接口', `外部热门 + 内部表现，每条记录都能溯源到原始文件（${freshLine()}）`,
-      `<button data-act="fetch-data">抓取最新数据</button><button class="ghost" data-act="refresh">刷新</button>`)}
+    ${head('数据接口', `外部热门 + 内部表现 + 知识区最新，每条记录都能溯源到原始文件（${freshLine()}）`,
+      `<button data-act="fetch-hot"${state.hot.running ? ' disabled' : ''}>${state.hot.running ? '抓取中…' : '抓取 B 站热门'}</button><button class="ghost" data-act="refresh">刷新</button>`)}
+    <div class="notice ai-free"><b>本区域不使用 AI。</b>抓取只跑确定性脚本（<code>node skills/*/scripts/run.mjs</code>），不经过 pi / 大模型、不消耗 token；B 站 Cookie 只能由人手动粘贴。需要「抓数据 → 建看板 → AI 推荐选题」的完整流水线，请到「数据看板 / 选题引擎」。</div>
+    <div class="grid two" style="margin-bottom:14px">${cookieCard()}${knowledgeCard()}</div>
     <div class="card" style="margin-bottom:14px">
       <div class="card-h">覆盖情况<span class="hint">platform / 样本量 / 维度</span></div>
+      ${hotResultLine()}
       <div class="row" style="margin-bottom:8px">${platformChips} ${pill(`样本 ${s.sources.reduce((a, x) => a + x.count, 0)} 条`)} ${pill(cov.hasCreatorMetrics ? '含博主维度' : '缺博主维度', cov.hasCreatorMetrics ? 'ok' : 'bad')}</div>
       <ul class="gap-list">${(cov.gaps || []).map((g) => `<li>${esc(g)}</li>`).join('')}</ul>
-      <div class="tiny muted mt">数据由 B-data 的 fetch-* skill 产出；C 侧只读不写。要补抖音 / 同赛道博主接口，在 HANDOFF.md 里提需求。</div>
+      <div class="tiny muted mt">热门 / 内部数据来自 B-data 的 fetch-* skill；知识区最新由「数据接口 → 立即抓取」或「定时定点」写入 <code>data/sources/</code>。网页只写 <code>data/sources/</code> 与 <code>data/schedule/</code>，不改流水线产物。要补抖音 / 同赛道博主接口，在 HANDOFF.md 里提需求。</div>
     </div>
     <div class="grid">${srcCards || emptyBox('还没有任何数据：先点右上角「抓取最新数据」')}</div>`;
 }
@@ -609,8 +620,135 @@ function renderPublish() {
     </div>`;
 }
 
+// ================================================================ 定时定点
+const zonesOf = () => state.data?.zones || state.schedule?.zones || [{ tid: 36, name: '知识（全部）' }];
+
+function cookieCard() {
+  const c = state.data?.cookie || state.schedule?.cookie || { configured: false };
+  return `
+  <div class="card ai-card">
+    <div class="card-h">Cookie（手动填写）<span class="hint">禁止 AI · 只存本机</span></div>
+    <div class="row" style="margin-bottom:8px">
+      ${pill(c.configured ? '已配置' : '未配置', c.configured ? 'ok' : 'bad')}
+      ${c.configured ? pill(`${c.bytes} 字符`) : ''}
+      ${c.configured && c.hasSessdata ? pill('含 SESSDATA', 'ok') : ''}
+      ${c.savedAt ? `<span class="tiny muted">保存于 ${stamp(c.savedAt)}</span>` : ''}
+      <span class="spacer"></span>
+      <span class="tiny muted"><code>${esc(c.file || 'data/secrets/bilibili-cookie.txt')}</code></span>
+    </div>
+    <div class="field">
+      <label>粘贴 bilibili.com 的 Cookie（至少包含 SESSDATA）</label>
+      <textarea id="cookie-input" rows="3" placeholder="SESSDATA=xxxx%2Cxxxx; bili_jct=yyyy; buvid3=zzzz"></textarea>
+    </div>
+    <div class="row">
+      <button data-act="save-cookie">保存到本机</button>
+      <button class="ghost" data-act="clear-cookie">清除</button>
+      <span class="spacer"></span>
+      <span class="tiny muted">不写日志、不进 output.json、不发给任何模型。</span>
+    </div>
+  </div>`;
+}
+
+function knowledgeCard() {
+  const k = state.knowledge;
+  const r = k.result;
+  const preview = r?.ok && r.preview?.length
+    ? `<ul class="gap-list">${r.preview.map((i) => `<li><a href="${esc(i.url || '#')}" target="_blank" rel="noreferrer">${esc(i.title)}</a>
+        <span class="tiny muted">${esc(i.channel || '')} · ${stamp(i.publishedAt)}</span></li>`).join('')}</ul>`
+    : '';
+  const result = !r ? '' : (r.ok
+    ? `<div class="row tiny" style="margin-top:8px">${pill(`${r.count} 条`, 'ok')}${pill(`抓取自 ${stamp(r.timestamp)}`)}${pill(r.cache?.hit ? '缓存命中' : '实时抓取')}${r.warnings?.length ? pill(`${r.warnings.length} 条告警`, 'warn') : ''}</div>${preview}`
+    : `<div class="notice err tiny" style="margin-top:8px"><b>${esc(r.error?.code || 'FETCH_FAILED')}</b> ${esc(r.error?.message || '')}</div>`);
+  return `
+  <div class="card ai-card">
+    <div class="card-h">知识区最新视频<span class="hint">确定性脚本 · 不经过 AI</span></div>
+    <div class="row" style="flex-wrap:wrap;gap:10px">
+      <select id="k-tid">${zonesOf().map((z) => `<option value="${z.tid}"${Number(k.tid) === z.tid ? ' selected' : ''}>${esc(z.name)}（${z.tid}）</option>`).join('')}</select>
+      <label class="tiny muted">条数 <input id="k-limit" type="number" min="1" max="50" value="${Number(k.limit) || 20}" style="width:74px" /></label>
+      <label class="tiny muted"><input type="checkbox" id="k-enrich"${k.enrich !== false ? ' checked' : ''} /> 补抓播放/点赞</label>
+      <span class="spacer"></span>
+      <button data-act="fetch-knowledge"${k.running ? ' disabled' : ''}>${k.running ? '抓取中…' : '立即抓取'}</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <input id="k-keywords" type="text" placeholder="关键词筛选（可选，逗号分隔）：AI, 大模型, 机器学习" value="${esc(k.keywords || '')}" />
+    </div>
+    <div class="tiny muted mt">调用 <code>node skills/fetch-bilibili-knowledge/scripts/run.mjs</code>，按发布时间倒序取知识区最新视频；遇 -352 风控先手动配置 Cookie。</div>
+    ${result}
+  </div>`;
+}
+
+function renderSchedule() {
+  const el = $('#view-schedule');
+  const sc = state.schedule;
+  if (!sc?.job) { el.innerHTML = head('定时定点', '加载中…'); return; }
+  const job = sc.job;
+  const st = sc.state || {};
+  const srv = sc.server || {};
+  const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+  const times = (job.times || []).map((t) => `<span class="chip">${esc(t)}<button class="chip-x" data-act="rm-time" data-time="${esc(t)}" title="删除">×</button></span>`).join('');
+  const days = dayNames.map((n, i) => `<label class="tiny"><input type="checkbox" data-day="${i}"${(job.days || []).includes(i) ? ' checked' : ''}/> 周${n}</label>`).join('');
+  const runRows = (sc.runs || []).map((r) => `<tr>
+    <td class="tiny">${stamp(r.at)}</td>
+    <td>${pill(r.trigger === 'schedule' ? '定时' : '手动')}</td>
+    <td>${r.status === 'success' ? pill('成功', 'ok') : pill('失败', 'bad')}</td>
+    <td class="num">${r.count ?? '—'}</td>
+    <td class="num">${r.durationMs == null ? '—' : `${(Math.round(r.durationMs / 100) / 10).toFixed(1)}s`}</td>
+    <td class="tiny">${r.error ? `<b>${esc(r.error)}</b> ${esc(r.message || '')}` : (r.cache ? '缓存命中' : '实时抓取')}</td>
+    <td class="tiny">${esc(r.runId || '')}</td></tr>`).join('');
+  const cookie = sc.cookie || {};
+
+  el.innerHTML = `
+    ${head('定时定点', `到点自动获取知识区最新视频 · 只用确定性脚本，不经过 AI · 时区 ${esc(srv.timezone || 'local')}`,
+      `<button data-act="run-schedule"${state.knowledge.running ? ' disabled' : ''}>立即执行一次</button><button class="ghost" data-act="refresh">刷新</button>`)}
+    <div class="notice ai-free"><b>本页不使用 AI。</b>定时任务直接执行 <code>${esc(sc.script || 'skills/fetch-bilibili-knowledge/scripts/run.mjs')}</code>，没有 pi、没有 prompt、没有 token 消耗；服务由 <code>./webui/start.sh</code> 常驻，关掉服务定时也会停。</div>
+    <div class="grid two">
+      <div class="card">
+        <div class="card-h">定点设置<span class="hint">每 ${srv.intervalSec || 20}s 检查一次</span></div>
+        <div class="row" style="margin-bottom:10px">
+          <label class="tiny"><input type="checkbox" id="s-enabled"${job.enabled ? ' checked' : ''}/> 启用定时</label>
+          <span class="spacer"></span>
+          ${job.enabled ? pill(job.nextRunAt ? `下次 ${stamp(job.nextRunAt)}` : '未安排', job.nextRunAt ? 'ok' : 'warn') : pill('已停用')}
+        </div>
+        <div class="field"><label>分区</label>
+          <select id="s-tid">${(sc.zones || zonesOf()).map((z) => `<option value="${z.tid}"${Number(job.params?.tid) === z.tid ? ' selected' : ''}>${esc(z.name)}（${z.tid}）</option>`).join('')}</select>
+        </div>
+        <div class="row" style="gap:14px;align-items:flex-end">
+          <div class="field" style="margin:0"><label>条数</label><input id="s-limit" type="number" min="1" max="50" value="${Number(job.params?.limit) || 20}" style="width:86px" /></div>
+          <label class="tiny muted" style="padding-bottom:6px"><input type="checkbox" id="s-enrich"${job.params?.enrich !== false ? ' checked' : ''}/> 补抓播放/点赞</label>
+        </div>
+        <div class="field"><label>关键词筛选（可选，逗号分隔）</label>
+          <input id="s-keywords" type="text" placeholder="AI,大模型,机器学习" value="${esc((job.params?.keywords || []).join(', '))}" />
+          <div class="tiny muted">纯字符串匹配，不做语义判断（依然不使用 AI）。</div>
+        </div>
+        <div class="field mt"><label>定点时间（HH:MM，可多个）</label>
+          <div class="row" style="gap:8px;flex-wrap:wrap">${times || '<span class="muted tiny">还没有时间点，先添加一个</span>'}</div>
+          <div class="row" style="margin-top:8px"><input id="s-new-time" type="time" step="60" value="${esc(state.knowledge.newTime || '')}" /><button class="ghost small" data-act="add-time">添加时间点</button></div>
+        </div>
+        <div class="field"><label>星期</label><div class="row" style="gap:10px;flex-wrap:wrap">${days}</div></div>
+        <div class="row"><button data-act="save-schedule">保存设置</button><button class="ghost" data-act="run-schedule"${state.knowledge.running ? ' disabled' : ''}>立即执行一次</button></div>
+      </div>
+      <div class="card">
+        <div class="card-h">运行状态</div>
+        <table><tbody>
+          <tr><td class="muted">下次执行</td><td>${job.enabled && job.nextRunAt ? stamp(job.nextRunAt) : '<span class="muted">未安排</span>'}</td></tr>
+          <tr><td class="muted">上次执行</td><td>${st.lastRunAt ? stamp(st.lastRunAt) : '<span class="muted">还没有跑过</span>'}</td></tr>
+          <tr><td class="muted">上次结果</td><td>${st.lastStatus ? (st.lastStatus === 'success' ? pill('成功', 'ok') : pill(`失败 ${esc(st.lastError || '')}`, 'bad')) : '—'} ${st.lastCount != null ? `<span class="tiny muted">${st.lastCount} 条</span>` : ''}</td></tr>
+          <tr><td class="muted">调度器</td><td>${pill(srv.schedulerActive ? `运行中 · 每 ${srv.intervalSec}s` : '未启动', srv.schedulerActive ? 'ok' : 'bad')} ${pill('不使用 AI', 'blue')}</td></tr>
+          <tr><td class="muted">Cookie</td><td>${cookie.configured ? pill('已手动配置', 'ok') : pill('未配置', 'warn')} <a class="tiny" href="#sources" data-act="go-sources">去数据接口填 →</a></td></tr>
+          <tr><td class="muted">产物</td><td class="tiny"><code>data/sources/bilibili-knowledge.json</code></td></tr>
+        </tbody></table>
+        <div class="tiny muted mt">定时到点后自动抓取并写回「数据接口」；失败会按同一时间点重试 1 次（下一个检查周期），并记在下方运行记录里。</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h">最近运行<span class="hint">${(sc.runs || []).length} 条</span></div>
+      <table><thead><tr><th>时间</th><th>触发</th><th>结果</th><th class="num">条数</th><th class="num">耗时</th><th>错误 / 缓存</th><th>run</th></tr></thead>
+        <tbody>${runRows || '<tr><td colspan="7" class="muted">还没有运行记录</td></tr>'}</tbody></table>
+    </div>`;
+}
+
 // ================================================================ 视图切换
-const VIEWS = ['sources', 'dashboard', 'topics', 'create', 'publish'];
+const VIEWS = ['sources', 'dashboard', 'topics', 'create', 'publish', 'schedule'];
 function switchView(name, updateHash = true) {
   if (!VIEWS.includes(name)) name = 'sources';
   state.view = name;
@@ -629,6 +767,7 @@ function render() {
   else if (state.view === 'topics') renderTopics();
   else if (state.view === 'create') renderCreate();
   else if (state.view === 'publish') renderPublish();
+  else if (state.view === 'schedule') renderSchedule();
 }
 
 // ================================================================ 创作流程
@@ -831,6 +970,168 @@ async function stopRun() {
   catch (e) { toast(e.message, true); }
 }
 
+// ================================================================ 数据采集（禁止 AI）/ 定时定点
+function syncKnowledgeForm() {
+  const tid = Number($('#k-tid')?.value);
+  if (tid) state.knowledge.tid = tid;
+  const limit = Number($('#k-limit')?.value);
+  if (limit) state.knowledge.limit = limit;
+  const en = $('#k-enrich');
+  if (en) state.knowledge.enrich = en.checked;
+  const kw = $('#k-keywords');
+  if (kw) state.knowledge.keywords = kw.value;
+}
+
+function currentScheduleJob() {
+  const src = state.schedule?.job || {};
+  const job = { ...src, params: { ...(src.params || {}) }, times: [...(src.times || [])], days: [...(src.days || [])] };
+  const en = $('#s-enabled');
+  if (en) job.enabled = en.checked;
+  const tid = Number($('#s-tid')?.value);
+  if (tid) job.params.tid = tid;
+  const limit = Number($('#s-limit')?.value);
+  if (limit) job.params.limit = limit;
+  const enr = $('#s-enrich');
+  if (enr) job.params.enrich = enr.checked;
+  const kw = $('#s-keywords');
+  if (kw) job.params.keywords = kw.value.split(/[,，\s]+/).map((x) => x.trim()).filter(Boolean);
+  if ($('#view-schedule')) {
+    job.days = $$('#view-schedule [data-day]').filter((x) => x.checked).map((x) => Number(x.dataset.day));
+  }
+  return job;
+}
+
+function hotResultLine() {
+  const r = state.hot.result;
+  if (!r) return '';
+  return `<div class="row tiny" style="margin-bottom:8px">
+    ${pill('B 站热门（不使用 AI）', 'blue')}
+    ${pill(r.ok ? `${r.count} 条` : '失败', r.ok ? 'ok' : 'bad')}
+    ${r.timestamp ? pill(`抓取自 ${stamp(r.timestamp)}`) : ''}
+    ${r.cache ? pill(r.cache.hit ? '缓存命中' : '实时抓取') : ''}
+    ${r.error ? `<span class="tiny" style="color:var(--red)">${esc(r.error.code)} ${esc(r.error.message || '')}</span>` : ''}
+  </div>`;
+}
+
+async function fetchHot() {
+  if (state.hot.running) return;
+  state.hot.running = true;
+  render();
+  setGlobal('抓取热门');
+  try {
+    const r = await api('/api/fetch/hot', { method: 'POST', body: JSON.stringify({ limit: 50 }) });
+    state.hot.result = r;
+    toast(r.ok ? `抓到 ${r.count} 条热门样本（不使用 AI）` : `抓取失败：${r.error?.code || 'UNKNOWN'} ${r.error?.message || ''}`, !r.ok);
+    await loadAll({ quiet: true });
+  } catch (e) {
+    toast(e.message, true);
+  } finally {
+    state.hot.running = false;
+    setGlobal(null);
+    render();
+  }
+}
+
+async function saveCookie() {
+  const raw = $('#cookie-input')?.value || '';
+  if (!raw.trim()) { toast('先粘贴 B 站 Cookie', true); return; }
+  try {
+    const r = await api('/api/cookie', { method: 'POST', body: JSON.stringify({ cookie: raw }) });
+    if (state.data) state.data.cookie = r;
+    if (state.schedule) state.schedule.cookie = r;
+    const box = $('#cookie-input');
+    if (box) box.value = '';
+    render();
+    toast('Cookie 已保存到本机（0600），不会进入日志/产物');
+  } catch (e) { toast(e.message, true); }
+}
+
+async function removeCookie() {
+  const ok = await dialog({
+    title: '清除 Cookie',
+    bodyHtml: '<p class="muted">会删除 <code>data/secrets/bilibili-cookie.txt</code>。下次遇到 B 站风控（-352）时需要重新手动粘贴。</p>',
+    okText: '清除',
+  });
+  if (!ok) return;
+  try {
+    const r = await api('/api/cookie', { method: 'DELETE' });
+    if (state.data) state.data.cookie = r;
+    if (state.schedule) state.schedule.cookie = r;
+    render();
+    toast('Cookie 已清除');
+  } catch (e) { toast(e.message, true); }
+}
+
+async function fetchKnowledge() {
+  if (state.knowledge.running) return;
+  syncKnowledgeForm();
+  state.knowledge.running = true;
+  render();
+  setGlobal('抓取知识区');
+  try {
+    const r = await api('/api/fetch/knowledge', {
+      method: 'POST',
+      body: JSON.stringify({
+        tid: state.knowledge.tid,
+        limit: state.knowledge.limit,
+        enrich: state.knowledge.enrich,
+        keywords: String(state.knowledge.keywords || '').split(/[,，\s]+/).map((x) => x.trim()).filter(Boolean),
+      }),
+    });
+    state.knowledge.result = r;
+    toast(r.ok ? `抓到 ${r.count} 条知识区最新视频` : `抓取失败：${r.error?.code || 'UNKNOWN'} ${r.error?.message || ''}`, !r.ok);
+    await loadAll({ quiet: true });
+  } catch (e) {
+    toast(e.message, true);
+  } finally {
+    state.knowledge.running = false;
+    setGlobal(null);
+    render();
+  }
+}
+
+async function saveSchedule() {
+  const job = currentScheduleJob();
+  if (!job.times.length) { toast('至少添加一个定点时间', true); return; }
+  if (!job.days.length) { toast('至少选一天', true); return; }
+  try {
+    const r = await api('/api/schedule', { method: 'POST', body: JSON.stringify({ job }) });
+    state.schedule = { ...state.schedule, ...r };
+    render();
+    toast('定时设置已保存');
+  } catch (e) { toast(e.message, true); }
+}
+
+async function runScheduleNow() {
+  if (state.knowledge.running) return;
+  state.knowledge.running = true;
+  render();
+  setGlobal('定点抓取');
+  try {
+    const r = await api('/api/schedule/run', { method: 'POST', body: JSON.stringify({ job: currentScheduleJob() }) });
+    state.schedule = { ...state.schedule, ...r };
+    await loadAll({ quiet: true });
+    const e = r.entry || {};
+    toast(r.ok ? `抓取成功：${e.count || 0} 条（不使用 AI）` : `抓取失败：${e.error || 'UNKNOWN'} ${e.message || ''}`, !r.ok);
+  } catch (e) {
+    toast(e.message, true);
+  } finally {
+    state.knowledge.running = false;
+    setGlobal(null);
+    render();
+  }
+}
+
+function addTimePoint() {
+  const v = String($('#s-new-time')?.value || '');
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(v)) { toast('先选一个时间点（HH:MM）', true); return; }
+  const job = currentScheduleJob();
+  job.times = [...new Set([...job.times, v])].sort();
+  state.schedule = { ...state.schedule, job: { ...state.schedule.job, ...job } };
+  state.knowledge.newTime = '';
+  render();
+}
+
 // ================================================================ 事件
 document.addEventListener('click', async (e) => {
   const t = e.target.closest('[data-act]');
@@ -854,6 +1155,22 @@ document.addEventListener('click', async (e) => {
     } catch (err) { toast(err.message, true); }
     return;
   }
+
+  if (act === 'save-cookie') { await saveCookie(); return; }
+  if (act === 'clear-cookie') { await removeCookie(); return; }
+  if (act === 'fetch-knowledge') { await fetchKnowledge(); return; }
+  if (act === 'fetch-hot') { await fetchHot(); return; }
+  if (act === 'save-schedule') { await saveSchedule(); return; }
+  if (act === 'run-schedule') { await runScheduleNow(); return; }
+  if (act === 'add-time') { addTimePoint(); return; }
+  if (act === 'rm-time') {
+    const job = currentScheduleJob();
+    job.times = job.times.filter((x) => x !== t.dataset.time);
+    state.schedule = { ...state.schedule, job: { ...state.schedule.job, ...job } };
+    render();
+    return;
+  }
+  if (act === 'go-sources') { switchView('sources'); return; }
 
   if (act === 'use-theme') {
     state.create = { stage: 'idle', themeId: t.dataset.theme, themesPath: t.dataset.path || 'data/themes/latest.json', runId: null, draft: null, production: null };
@@ -886,6 +1203,33 @@ $('#stopBtn').addEventListener('click', stopRun);
 $('#tabs').addEventListener('click', (e) => {
   const t = e.target.closest('.tab');
   if (t) switchView(t.dataset.view);
+});
+
+// 表单改动先写回 state（不重渲染，避免输入被打断），点保存/执行时再提交
+document.addEventListener('change', (e) => {
+  const t = e.target;
+  if (!t || !t.closest) return;
+  if (t.closest('#view-sources')) {
+    if (t.id === 'k-tid') state.knowledge.tid = Number(t.value) || 36;
+    else if (t.id === 'k-limit') state.knowledge.limit = Math.min(50, Math.max(1, Number(t.value) || 20));
+    else if (t.id === 'k-enrich') state.knowledge.enrich = t.checked;
+    else if (t.id === 'k-keywords') state.knowledge.keywords = t.value;
+    return;
+  }
+  if (t.closest('#view-schedule')) {
+    const job = state.schedule?.job;
+    if (!job) return;
+    if (t.id === 's-enabled') job.enabled = t.checked;
+    else if (t.id === 's-tid') job.params = { ...(job.params || {}), tid: Number(t.value) || 36 };
+    else if (t.id === 's-limit') job.params = { ...(job.params || {}), limit: Math.min(50, Math.max(1, Number(t.value) || 20)) };
+    else if (t.id === 's-enrich') job.params = { ...(job.params || {}), enrich: t.checked };
+    else if (t.id === 's-keywords') job.params = { ...(job.params || {}), keywords: t.value.split(/[,，\s]+/).map((x) => x.trim()).filter(Boolean) };
+    else if (t.id === 's-new-time') state.knowledge.newTime = t.value;
+    else if (t.dataset.day != null) {
+      const d = Number(t.dataset.day);
+      job.days = t.checked ? [...new Set([...(job.days || []), d])].sort((a, b) => a - b) : (job.days || []).filter((x) => x !== d);
+    }
+  }
 });
 window.addEventListener('hashchange', () => switchView(location.hash.slice(1) || 'sources', false));
 

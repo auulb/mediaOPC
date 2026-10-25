@@ -227,3 +227,25 @@
   2. `fetch-bilibili` 的 limit 可从 3 提到 10+，否则博主维度样本太薄
 - 需要 A：`webui/test/*.test.mjs` 进根 test glob（+13 条）；`schedule.yaml` 目前全 disabled，看板已展示
 - 仍未做：B 站封面上传（只准备横/竖两张图，投稿页封面仍由平台自动截帧）；真实投稿仍需人工扫码验证
+
+## M5 数据接口（禁止 AI）+ 手动 Cookie + 定时定点（2026-10-25，C 侧）
+- 新增第六个页签「定时定点」（发布引擎之后，hash `#schedule`）：定点设置（启用 / 分区 / 条数 / 关键词 / 多个 HH:MM / 星期）、下次执行、上次结果、调度器状态、最近运行记录
+- **数据接口 + Cookie 区域明确「不使用 AI」**：页面顶部有绿色说明条；抓取只 `spawn(node skills/<skill>/scripts/run.mjs)`，不经过 pi、无 prompt、无 token
+- 数据接口新增两块卡片：
+  1. Cookie（手动填写）：只接受人手粘贴（必须含 `SESSDATA`），写 `data/secrets/bilibili-cookie.txt`（目录 0700 / 文件 0600）；`/api/cookie` 只回 `configured/bytes/savedAt/hasSessdata`，**永不回显原文**；`data/secrets/` 不在 `/media` 白名单
+  2. 知识区最新视频：`tid` 可选知识（36）/ 科学科普（201）/ 人文历史（228）等 9 个分区；条数、补抓播放/点赞、关键词筛选
+- 新增插件 `plugins/data-sources/bilibili-knowledge.mjs`（id `bilibili-knowledge`，缓存 5 分钟）：
+  - `mode=latest` 走 `x/web-interface/newlist`（按 pubdate 倒序 = 知识区最新），`mode=ranking` 走 `ranking/v2`（易 -352）
+  - newlist 的 `stat` 恒为 0 → 逐条 `x/web-interface/view` 补播放/点赞（默认 8 条，连续失败 2 条即停止并写 warning）
+  - 翻页会因新投稿顶位产生重复 → 按 bvid 去重；关键词为**纯字符串匹配**（中文 substring / ASCII 词边界，避免 "AI" 命中 "email"），不调用任何模型
+- 新增 skill `skills/fetch-bilibili-knowledge/`（SKILL.md + input/output schema + `scripts/run.mjs` + `validate.mjs`），fixture `fixtures/fetch-bilibili-knowledge/output.json`（真实抓取样本），`validate-fixtures` 12/12
+- Cookie 安全：`plugins/data-sources/lib/cookie.mjs`；`base.mjs` 的 `stripControl` 现在剔除 `cookie/cookieFile`，Cookie 不进 `output.json.params`、不进缓存 key、不进日志
+- 定时定点实现（不碰 A 的 scheduler）：webui 进程内 20s tick，命中「星期 + HH:MM」且同一分钟未跑才触发；状态落 `data/schedule/{jobs.json,state.json,runs.jsonl}`；页面 SSE 收 `done` 自动刷新
+- 新增 API：`GET/POST/DELETE /api/cookie`、`POST /api/fetch/knowledge`、`POST /api/fetch/hot`、`GET/POST /api/schedule`、`POST /api/schedule/run`；`/api/data` 增补 `cookie` 与 `zones`
+- 数据接口页不再有「跑完整 AI 流水线」按钮（挪到数据看板 / 选题引擎），页内只剩确定性抓取：`POST /api/fetch/hot` 与 `POST /api/fetch/knowledge` 共用 `runDirectFetch()`（单飞、SSE 日志、写 `data/sources/`）；`sourcesView()` 按 dataSource 去重（保留时间最新的一份）
+- 测试：`npm test` 108/108（新增 knowledge 8 条 + webui Cookie/定时 2 条；`webui/test/*.test.mjs` 已并入根 test glob，共 15 条）
+- 实测：知识区 latest 抓 20 条 7.0s；关键词 `AI` 60→3 条；定时保存后下一次 07:30 生效；手动「立即执行一次」写入 runs.jsonl
+- 已知限制 / 后续：
+  1. `newlist` 按分区标签返回，知识区里混有少量「游戏/影视解说」投稿（平台分类所致），需要更高信噪比时用 `mode=ranking` + 手动 Cookie，或收紧 `keywords`
+  2. `-352` 只能人工粘 Cookie 解决（这是设计约束，不做自动登录/自动重试刷接口）
+  3. 定时依赖 `webui/server.mjs` 常驻（关闭服务即停）；目前只维护单个 job，多 job 需要给 `jobs.json` 换数组结构

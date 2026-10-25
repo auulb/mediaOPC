@@ -58,9 +58,9 @@ export class DataSourcePlugin {
     await fs.writeFile(file, JSON.stringify({ lastRequestAt: Date.now() }));
   }
 
-  /** 由参数生成稳定缓存 key（忽略控制类参数） */
+  /** 由参数生成稳定缓存 key（忽略控制类参数；Cookie 既不进 key 也不落盘） */
   cacheKey(params) {
-    const { cacheTtlSec, noCache, ...rest } = params || {};
+    const rest = stripControl(params);
     const sorted = JSON.stringify(rest, Object.keys(rest).sort());
     return `${this.id}-${crypto.createHash('sha1').update(sorted).digest('hex').slice(0, 12)}`;
   }
@@ -115,8 +115,12 @@ export class DataSourcePlugin {
   }
 }
 
+// Cookie 只用于请求头：不能出现在 output.json 的 params 回显里，也不参与缓存 key
+const CONTROL_PARAMS = ['noCache', 'cookie', 'cookieFile'];
+
 function stripControl(params) {
-  const { noCache, ...rest } = params;
+  const rest = { ...(params || {}) };
+  for (const k of CONTROL_PARAMS) delete rest[k];
   return rest;
 }
 

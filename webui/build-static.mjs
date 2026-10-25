@@ -33,21 +33,26 @@ async function getJson(p) {
 }
 
 console.log(`→ 从 ${BASE} 抓取快照`);
-const [data, topics, productions, bootstrap] = await Promise.all([
+const [data, topics, productions, bootstrap, schedule] = await Promise.all([
   getJson('/api/data'),
   getJson('/api/topics'),
   getJson('/api/productions'),
   getJson('/api/bootstrap'),
+  getJson('/api/schedule'),
 ]);
 
 // 静态站不展示「正在运行」的历史态
 bootstrap.active = null;
 bootstrap.runs = (bootstrap.runs || []).slice(0, 8).map((r) => ({ ...r, active: false }));
 
+// 静态站没有调度器：标成未启动、不排下次执行
+schedule.server = { ...(schedule.server || {}), schedulerActive: false, staticDemo: true };
+if (schedule.job) schedule.job.nextRunAt = null;
+
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(path.join(OUT, 'static-data'), { recursive: true });
 
-const snapshots = { data, topics, productions, bootstrap };
+const snapshots = { data, topics, productions, bootstrap, schedule };
 for (const [name, body] of Object.entries(snapshots)) {
   fs.writeFileSync(path.join(OUT, 'static-data', `${name}.json`), `${JSON.stringify(body, null, 2)}\n`);
   console.log(`  · static-data/${name}.json  ${(JSON.stringify(body).length / 1024).toFixed(0)} KB`);
@@ -99,7 +104,8 @@ fs.writeFileSync(
 这个分支（\`gh-pages\`）只放构建好的静态站点，供 GitHub Pages / Vercel 托管。
 
 - 数据快照生成时间：${data.dashboard?.generatedAt || new Date().toISOString()}
-- 只读演示：选题、看板、成片、预检结果都是快照；写稿/渲染/真实投稿需要本地运行
+- 只读演示：选题、看板、成片、预检结果、数据接口与定时定点设置都是快照；写稿/渲染/真实投稿/Cookie/抓取需要本地运行
+- 数据接口与定时定点**不使用 AI**：静态站只展示最近一次抓取结果，抓取本身必须本地跑确定性脚本
 - 源码与完整功能：https://github.com/auulb/mediaOPC （main 分支）
 - 本地运行：\`git clone\` 后 \`./webui/start.sh\` → http://127.0.0.1:4180
 

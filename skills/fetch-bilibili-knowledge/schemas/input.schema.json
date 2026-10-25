@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "fetch-bilibili-knowledge input",
+  "description": "参数放在 params 中；也接受 step-envelope（取 data.params）。全部可选。禁止在 params 里传 cookie，Cookie 只能手动写到 data/secrets/bilibili-cookie.txt。",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "params": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tid": { "type": "integer", "minimum": 1, "maximum": 9999, "default": 36, "description": "知识区=36；子分区如科学科普=201" },
+        "limit": { "type": "integer", "minimum": 1, "maximum": 50, "default": 20 },
+        "mode": { "type": "string", "enum": ["latest", "ranking"], "default": "latest", "description": "latest=最新发布；ranking=分区排行（易触发 -352，建议先手动配 Cookie）" },
+        "enrich": { "type": "boolean", "default": true, "description": "逐条补抓播放/点赞（newlist 的 stat 恒为 0）" },
+        "enrichLimit": { "type": "integer", "minimum": 1, "maximum": 20, "default": 8 },
+        "keywords": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 20 }, "maxItems": 5, "description": "可选：标题/分区/简介包含任一关键词（纯字符串匹配，不做语义判断）" },
+        "noCache": { "type": "boolean", "default": false },
+        "cacheTtlSec": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

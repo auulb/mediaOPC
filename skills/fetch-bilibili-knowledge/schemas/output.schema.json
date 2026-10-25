@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "fetch-bilibili-knowledge output",
+  "description": "平铺写出 raw-items v1（dataSource=bilibili-knowledge）。$ref 使用 contracts/raw-items.schema.json 的 $id。",
+  "$ref": "opc/raw-items.schema.json"
+}

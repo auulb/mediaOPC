@@ -11,6 +11,8 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { parse as parseYaml } from 'yaml';
+import { cookieStatus, writeCookie, clearCookie } from '../plugins/data-sources/lib/cookie.mjs';
+import { KNOWLEDGE_ZONES } from '../plugins/data-sources/bilibili-knowledge.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
@@ -84,31 +86,29 @@ function readStepOutput(runId, stepId) {
   };
 }
 
+/** 同一个 dataSource 可能同时来自 workspace 快照和 data/sources（手动/定时抓取）：保留最新一份 */
+function dedupeSources(list) {
+  const bySource = new Map();
+  for (const src of list) {
+    const prev = bySource.get(src.dataSource);
+    if (!prev) { bySource.set(src.dataSource, src); continue; }
+    const t = (x) => Date.parse(x.timestamp || '') || 0;
+    if (t(src) >= t(prev)) bySource.set(src.dataSource, src);
+  }
+  return [...bySource.values()];
+}
+
 function sourcesView() {
   const dash = readJson(path.join(ROOT, 'dashboard/dashboard.json'));
-  const list = [];
+  let list = [];
   for (const src of dash?.sources || []) {
     if (src.kind !== 'raw-items') continue; // token-ledger / task-status 不是采集接口
-    const doc = readJson(safePath(src.file) || '');
-    const items = Array.isArray(doc?.items) ? doc.items : [];
-    list.push({
-      id: src.id,
-      dataSource: src.dataSource || 'unknown',
-      kind: src.kind,
-      timestamp: src.timestamp || doc?.timestamp || null,
-      file: src.file,
-      count: items.length,
-      fields: items[0] ? Object.keys(items[0]) : [],
-      items: items.map((i) => ({
-        id: i.id, title: i.title, url: urlOf(i), platform: i.platform || doc?.platform || null,
-        channel: i.channel?.name || null, views: i.views ?? null, likes: i.likes ?? null,
-        comments: i.comments ?? null, shares: i.shares ?? null, favorites: i.favorites ?? null,
-        engagement: i.metrics?.engagement ?? null, viewsPerHour: i.metrics?.viewsPerHour ?? null,
-        velocity: i.metrics?.velocity ?? null, tags: i.tags || [], category: i.category || null,
-        durationSec: i.durationSec ?? null, publishDate: i.publishDate || null,
-        internal: i.internal || null,
-      })),
-    });
+    list.push(sourceEntry(src, readJson(safePath(src.file) || '')));
+  }
+  // AI 无关的确定性采集（数据接口页 / 定时定点）落在 data/sources/，看板没跑到时也能看到
+  for (const doc of readRawSourceDocs()) {
+    if (list.some((x) => x.file === doc.file)) continue;
+    list.push(sourceEntry({ id: doc.dataSource, dataSource: doc.dataSource, timestamp: doc.timestamp, file: doc.file }, doc));
   }
   const creators = new Map();
   for (const src of list) {
@@ -127,6 +127,8 @@ function sourcesView() {
       creators.set(key, cur);
     }
   }
+
+  list = dedupeSources(list);
 
   const platforms = [...new Set(list.filter((x) => !/internal/.test(x.dataSource))
     .map((x) => (x.items[0]?.platform || '').toLowerCase()).filter(Boolean))];
@@ -150,6 +152,339 @@ function sourcesView() {
       ],
     },
   };
+}
+
+/** raw-items 文档 → 数据接口卡片（dashboard.sources 与 data/sources/*.json 共用） */
+function sourceEntry(meta, doc) {
+  const items = Array.isArray(doc?.items) ? doc.items : [];
+  return {
+    id: meta.id || doc?.dataSource || 'unknown',
+    dataSource: meta.dataSource || doc?.dataSource || 'unknown',
+    kind: 'raw-items',
+    timestamp: meta.timestamp || doc?.timestamp || null,
+    file: meta.file,
+    count: items.length,
+    fields: items[0] ? Object.keys(items[0]) : [],
+    cache: doc?.cache ? { hit: Boolean(doc.cache.hit), expiresAt: doc.cache.expiresAt || null } : null,
+    params: doc?.params || null,
+    warnings: doc?.warnings || [],
+    items: items.map((i) => ({
+      id: i.id, title: i.title, url: urlOf(i), platform: i.platform || doc?.platform || null,
+      channel: i.channel?.name || null, views: i.views ?? null, likes: i.likes ?? null,
+      comments: i.comments ?? null, shares: i.shares ?? null, favorites: i.favorites ?? null,
+      engagement: i.metrics?.engagement ?? null, viewsPerHour: i.metrics?.viewsPerHour ?? null,
+      velocity: i.metrics?.velocity ?? null, tags: i.tags || [], category: i.category || null,
+      durationSec: i.durationSec ?? null, publishDate: i.publishDate || null,
+      publishedAt: i.publishedAt || null, internal: i.internal || null,
+    })),
+  };
+}
+
+/** 数据接口页 / 定时定点的确定性产物目录（不含任何 AI 输出） */
+function readRawSourceDocs() {
+  if (!exists(SOURCES_DIR)) return [];
+  const docs = [];
+  for (const f of fs.readdirSync(SOURCES_DIR)) {
+    if (!f.endsWith('.json') || f.startsWith('.')) continue;
+    const doc = readJson(path.join(SOURCES_DIR, f));
+    if (!doc || doc.schemaVersion !== 1 || !doc.dataSource || !Array.isArray(doc.items)) continue;
+    docs.push({ ...doc, file: `data/sources/${f}` });
+  }
+  return docs;
+}
+
+// ================================================================ 数据采集（禁止 AI）
+// 这一区域只跑确定性脚本：node skills/<skill>/scripts/run.mjs。
+// 不经过 pi / 大模型；B 站 Cookie 只能由人手动粘贴，落盘 0600 且不对外返回原文。
+const SOURCES_DIR = process.env.OPC_SOURCES_DIR ? path.resolve(process.env.OPC_SOURCES_DIR) : path.join(ROOT, 'data/sources');
+const KNOWLEDGE_SCRIPT = 'skills/fetch-bilibili-knowledge/scripts/run.mjs';
+
+const KNOWLEDGE_DEFAULTS = { tid: 36, limit: 20, enrich: true };
+const ZONE_IDS = new Set(KNOWLEDGE_ZONES.map((z) => z.tid));
+
+let directBusy = null;
+
+function normalizeKnowledgeParams(input = {}) {
+  const tid = Number(input.tid ?? KNOWLEDGE_DEFAULTS.tid);
+  const limit = Number(input.limit ?? KNOWLEDGE_DEFAULTS.limit);
+  const rawKw = Array.isArray(input.keywords) ? input.keywords : String(input.keywords ?? '').split(/[,，\s]+/);
+  const keywords = [...new Set(rawKw.map((k) => String(k).trim()).filter(Boolean))].slice(0, 5);
+  return {
+    tid: ZONE_IDS.has(tid) ? tid : KNOWLEDGE_DEFAULTS.tid,
+    limit: Math.min(Math.max(Math.floor(Number.isFinite(limit) ? limit : KNOWLEDGE_DEFAULTS.limit), 1), 50),
+    enrich: input.enrich !== false,
+    ...(keywords.length ? { keywords } : {}),
+    ...(input.mode === 'ranking' ? { mode: 'ranking' } : {}),
+  };
+}
+
+function normalizeHotParams(input = {}) {
+  const limit = Number(input.limit ?? 50);
+  return { limit: Math.min(Math.max(Math.floor(Number.isFinite(limit) ? limit : 50), 1), 100) };
+}
+
+/** 网页可直接执行的确定性采集（全部禁止 AI）：只 spawn 脚本，不经过 pi / 大模型 */
+const DIRECT_FETCH = {
+  knowledge: {
+    label: '知识区最新视频',
+    script: KNOWLEDGE_SCRIPT,
+    out: 'bilibili-knowledge.json',
+    normalize: normalizeKnowledgeParams,
+  },
+  hot: {
+    label: 'B 站热门',
+    script: 'skills/fetch-bilibili-hot/scripts/run.mjs',
+    out: 'bilibili-hot.json',
+    normalize: normalizeHotParams,
+  },
+};
+
+/** 单飞（并发请求 409），日志走 SSE；产物写 data/sources/<out> */
+function runDirectFetch(key, params = {}, { trigger = 'manual' } = {}) {
+  const job = DIRECT_FETCH[key];
+  if (!job) return Promise.reject(Object.assign(new Error(`未知采集任务：${key}`), { status: 400 }));
+  if (directBusy) return Promise.reject(Object.assign(new Error('已经有一次抓取在进行中，请稍候'), { status: 409 }));
+
+  const p = job.normalize(params);
+  const outFile = path.join(SOURCES_DIR, job.out);
+  const inFile = path.join(SOURCES_DIR, `.${key}.input.json`);
+  const errFile = path.join(SOURCES_DIR, 'error.json');
+  const runId = `fetch-${key}-${trigger}-${stamp()}`;
+  const startedAt = Date.now();
+
+  fs.mkdirSync(SOURCES_DIR, { recursive: true });
+  fs.writeFileSync(inFile, `${JSON.stringify({ params: p }, null, 2)}\n`);
+  fs.rmSync(errFile, { force: true });
+
+  const push = (stream, line) => {
+    if (!line.trim()) return;
+    broadcast({ type: 'log', runId, stream, line, t: Date.now() });
+  };
+  push('stdout', `[no-ai] ${job.script} ${JSON.stringify(p)}`);
+  broadcast({ type: 'started', runId, pipeline: `fetch-${key}`, startedAt });
+
+  directBusy = new Promise((resolve) => {
+    const child = spawn(process.execPath, [job.script,
+      '--input', path.relative(ROOT, inFile),
+      '--output', path.relative(ROOT, outFile)], {
+      cwd: ROOT,
+      env: { ...process.env },
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    const wire = (stream, chunk) => { for (const line of chunk.toString().split('\n')) push(stream, line); };
+    child.stdout.on('data', (c) => wire('stdout', c));
+    child.stderr.on('data', (c) => wire('stderr', c));
+    child.on('error', (e) => push('stderr', `启动失败：${e.message}`));
+    child.on('exit', (code) => {
+      const durationMs = Date.now() - startedAt;
+      const error = code === 0 ? null : (readJson(errFile) || { code: 'FETCH_FAILED', message: `脚本退出码 ${code}` });
+      const doc = code === 0 ? readJson(outFile) : null;
+      const result = {
+        ok: code === 0 && Boolean(doc),
+        key,
+        label: job.label,
+        runId,
+        trigger,
+        params: p,
+        keywords: p.keywords || [],
+        durationMs,
+        count: doc?.items?.length || 0,
+        timestamp: doc?.timestamp || null,
+        cache: doc?.cache ? { hit: Boolean(doc.cache.hit), expiresAt: doc.cache.expiresAt || null } : null,
+        warnings: doc?.warnings || [],
+        preview: (doc?.items || []).slice(0, 5).map((i) => ({ id: i.id, title: i.title, url: i.url, publishedAt: i.publishedAt || null, channel: i.channel?.name || null })),
+        file: path.relative(ROOT, outFile),
+        ...(error ? { error } : {}),
+      };
+      push('stdout', result.ok ? `[no-ai] 完成：${result.count} 条 → ${result.file}` : `[no-ai] 失败：${error.code} ${error.message}`);
+      broadcast({ type: 'done', runId, code, adhoc: true });
+      resolve(result);
+    });
+  }).finally(() => { directBusy = null; });
+
+  return directBusy;
+}
+
+const runKnowledgeFetch = (params = {}, opts = {}) => runDirectFetch('knowledge', params, opts);
+
+// ================================================================ 定时定点（webui 自己的调度，只跑确定性抓取）
+const SCHED_DIR = process.env.OPC_SCHED_DIR ? path.resolve(process.env.OPC_SCHED_DIR) : path.join(ROOT, 'data/schedule');
+const JOBS_FILE = path.join(SCHED_DIR, 'jobs.json');
+const SCHED_STATE = path.join(SCHED_DIR, 'state.json');
+const SCHED_RUNS = path.join(SCHED_DIR, 'runs.jsonl');
+const TICK_SEC = 20;
+
+const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
+const DEFAULT_JOB = {
+  id: 'knowledge-latest',
+  name: '知识区最新视频',
+  enabled: true,
+  times: ['09:00', '19:00'],
+  days: ALL_DAYS.slice(),
+  params: { ...KNOWLEDGE_DEFAULTS },
+};
+
+function normalizeJob(input = {}) {
+  const times = [...new Set((Array.isArray(input.times) ? input.times : [])
+    .map((t) => String(t).trim())
+    .filter((t) => /^([01]\d|2[0-3]):[0-5]\d$/.test(t)))].sort();
+  const days = [...new Set((Array.isArray(input.days) ? input.days : [])
+    .map((d) => Number(d))
+    .filter((d) => Number.isInteger(d) && d >= 0 && d <= 6))].sort();
+  return {
+    id: cleanId(input.id) || DEFAULT_JOB.id,
+    name: String(input.name || DEFAULT_JOB.name).slice(0, 40),
+    enabled: input.enabled !== false,
+    times: times.length ? times : DEFAULT_JOB.times.slice(),
+    days: days.length ? days : ALL_DAYS.slice(),
+    params: normalizeKnowledgeParams(input.params || {}),
+    updatedAt: input.updatedAt || null,
+  };
+}
+
+function loadJob() {
+  const raw = readJson(JOBS_FILE);
+  return normalizeJob(raw?.job || DEFAULT_JOB);
+}
+
+function saveJob(input) {
+  const job = normalizeJob({ ...input, updatedAt: new Date().toISOString() });
+  fs.mkdirSync(SCHED_DIR, { recursive: true });
+  const tmp = `${JOBS_FILE}.tmp`;
+  fs.writeFileSync(tmp, `${JSON.stringify({ version: 1, job }, null, 2)}\n`);
+  fs.renameSync(tmp, JOBS_FILE);
+  return job;
+}
+
+const loadSchedState = () => readJson(SCHED_STATE) || {};
+function patchSchedState(patch) {
+  const next = { ...loadSchedState(), ...patch };
+  try {
+    fs.mkdirSync(SCHED_DIR, { recursive: true });
+    const tmp = `${SCHED_STATE}.tmp`;
+    fs.writeFileSync(tmp, `${JSON.stringify(next, null, 2)}\n`);
+    fs.renameSync(tmp, SCHED_STATE);
+  } catch { /* 状态写失败不影响抓取 */ }
+  return next;
+}
+
+function appendRun(entry) {
+  try {
+    fs.mkdirSync(SCHED_DIR, { recursive: true });
+    fs.appendFileSync(SCHED_RUNS, `${JSON.stringify(entry)}\n`);
+  } catch { /* 忽略 */ }
+}
+
+function recentRuns(n = 12) {
+  const text = readText(SCHED_RUNS);
+  if (!text) return [];
+  const out = [];
+  for (const line of text.split('\n')) {
+    if (!line.trim()) continue;
+    try { out.push(JSON.parse(line)); } catch { /* 跳过坏行 */ }
+  }
+  return out.slice(-n).reverse();
+}
+
+function nextRunAt(job, now = new Date()) {
+  if (!job.enabled || !job.times.length || !job.days.length) return null;
+  for (let offset = 0; offset < 8; offset++) {
+    const day = new Date(now);
+    day.setDate(day.getDate() + offset);
+    day.setHours(0, 0, 0, 0);
+    if (!job.days.includes(day.getDay())) continue;
+    for (const t of job.times) {
+      const [h, m] = t.split(':').map(Number);
+      const at = new Date(day.getTime());
+      at.setHours(h, m, 0, 0);
+      if (at.getTime() > now.getTime()) return at.toISOString();
+    }
+  }
+  return null;
+}
+
+function timedScheduleView() {
+  const job = loadJob();
+  const st = loadSchedState();
+  const runs = recentRuns(12);
+  return {
+    job: { ...job, nextRunAt: nextRunAt(job) },
+    state: {
+      lastRunAt: st.lastRunAt || runs[0]?.at || null,
+      lastStatus: st.lastStatus || runs[0]?.status || null,
+      lastCount: st.lastCount ?? runs[0]?.count ?? null,
+      lastError: st.lastError || null,
+    },
+    runs,
+    server: {
+      now: new Date().toISOString(),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'local',
+      intervalSec: TICK_SEC,
+      schedulerActive: Boolean(schedTimer),
+      mode: 'no-ai',
+    },
+    zones: KNOWLEDGE_ZONES,
+    cookie: cookieStatus(),
+    script: KNOWLEDGE_SCRIPT,
+    aiFree: true,
+  };
+}
+
+const dateKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+async function executeScheduledJob(job, trigger = 'schedule') {
+  const at = new Date().toISOString();
+  let entry;
+  try {
+    const r = await runKnowledgeFetch(job.params, { trigger });
+    entry = {
+      runId: r.runId, trigger, at, finishedAt: new Date().toISOString(),
+      status: r.ok ? 'success' : 'failed', count: r.count || 0,
+      cache: r.cache?.hit ?? null, durationMs: r.durationMs,
+      error: r.ok ? null : (r.error?.code || 'FETCH_FAILED'),
+      message: r.ok ? null : (r.error?.message || null),
+    };
+  } catch (e) {
+    entry = {
+      runId: `fetch-${trigger}-${stamp()}`, trigger, at,
+      finishedAt: new Date().toISOString(), status: 'failed', count: 0,
+      durationMs: 0, error: e.code || 'FETCH_FAILED', message: e.message,
+    };
+  }
+  appendRun(entry);
+  patchSchedState({
+    lastRunAt: entry.at, lastStatus: entry.status,
+    lastCount: entry.count, lastError: entry.error || null,
+  });
+  broadcast({ type: 'schedule', ...entry });
+  return entry;
+}
+
+let schedTimer = null;
+
+/** 每 20 秒看一次：命中「天 + 定点 HH:MM」就抓，同一分钟只触发一次 */
+async function schedTick() {
+  try {
+    const job = loadJob();
+    if (!job.enabled) return;
+    const now = new Date();
+    if (!job.days.includes(now.getDay())) return;
+    const hhmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    if (!job.times.includes(hhmm)) return;
+    const key = `${job.id}@${dateKey(now)}T${hhmm}`;
+    if (loadSchedState().lastRunKey === key) return;
+    patchSchedState({ lastRunKey: key }); // 先占位，避免同一分钟重复触发
+    await executeScheduledJob(job, 'schedule');
+  } catch (e) {
+    process.stderr.write(`[schedule] tick 失败：${e.message}\n`);
+  }
+}
+
+function startWebScheduler() {
+  if (schedTimer) return;
+  schedTimer = setInterval(() => { schedTick(); }, TICK_SEC * 1000);
+  schedTimer.unref?.();
+  schedTick();
 }
 
 function dashboardView() {
@@ -176,7 +511,7 @@ function dashboardView() {
   };
 }
 
-function scheduleView() {
+function configScheduleView() {
   try {
     const y = parseYaml(readText(path.join(ROOT, 'config/schedule.yaml')) || '') || {};
     return (y.schedules || []).map((s) => ({ name: s.name, cron: s.cron, pipeline: s.pipeline, enabled: Boolean(s.enabled), manualApproval: Boolean(s.manual_approval) }));
@@ -612,10 +947,49 @@ const server = http.createServer(async (req, res) => {
 
     // ------------------------------------------------------------ 业务视图
     if (req.method === 'GET' && p === '/api/data') {
-      return json(res, 200, { dashboard: dashboardView(), sources: sourcesView(), schedule: scheduleView() });
+      return json(res, 200, { dashboard: dashboardView(), sources: sourcesView(), schedule: configScheduleView(), cookie: cookieStatus(), zones: KNOWLEDGE_ZONES });
     }
     if (req.method === 'GET' && p === '/api/topics') return json(res, 200, topicsView());
     if (req.method === 'GET' && p === '/api/productions') return json(res, 200, { productions: scanProductions() });
+
+    // ---------------------------------------------- 数据采集（禁止 AI）+ Cookie 手动 ---------------------------------------------- 
+    if (req.method === 'GET' && p === '/api/cookie') {
+      return json(res, 200, { ...cookieStatus(), zones: KNOWLEDGE_ZONES, script: KNOWLEDGE_SCRIPT, aiFree: true });
+    }
+    if (req.method === 'POST' && p === '/api/cookie') {
+      const body = await readBody(req);
+      const r = writeCookie(body.cookie);
+      if (!r.ok) return bad(res, 400, r.error);
+      return json(res, 200, { ok: true, ...cookieStatus() });
+    }
+    if (req.method === 'DELETE' && p === '/api/cookie') {
+      clearCookie();
+      return json(res, 200, { ok: true, ...cookieStatus() });
+    }
+    if (req.method === 'POST' && p === '/api/fetch/knowledge') {
+      const body = await readBody(req);
+      const r = await runDirectFetch('knowledge', body, { trigger: 'manual' });
+      return json(res, 200, r);
+    }
+    if (req.method === 'POST' && p === '/api/fetch/hot') {
+      const body = await readBody(req);
+      const r = await runDirectFetch('hot', body, { trigger: 'manual' });
+      return json(res, 200, r);
+    }
+
+    // ---------------------------------------------- 定时定点（只跑确定性抓取） ---------------------------------------------- 
+    if (req.method === 'GET' && p === '/api/schedule') return json(res, 200, timedScheduleView());
+    if (req.method === 'POST' && p === '/api/schedule') {
+      const body = await readBody(req);
+      const job = saveJob(body.job || body);
+      return json(res, 200, { ok: true, ...timedScheduleView(), job: { ...job, nextRunAt: nextRunAt(job) } });
+    }
+    if (req.method === 'POST' && p === '/api/schedule/run') {
+      const body = await readBody(req);
+      const job = saveJob(body.job || loadJob()); // 先存再跑，保证跑的就是页面上的设置
+      const entry = await executeScheduledJob(job, 'manual');
+      return json(res, 200, { ok: entry.status === 'success', entry, ...timedScheduleView() });
+    }
 
     if (req.method === 'GET' && p === '/api/create/draft') {
       const runId = cleanId(url.searchParams.get('id'));
@@ -802,6 +1176,9 @@ server.on('error', (e) => {
 server.listen(PORT, HOST, () => {
   const url = `http://${HOST}:${PORT}`;
   process.stdout.write(`OPC 控制台已启动：${url}\n仓库根：${ROOT}\n`);
+  startWebScheduler();
+  const job = loadJob();
+  process.stdout.write(`定时定点：${job.enabled ? '已启用' : '未启用'} ${job.times.join(' / ')}（每 ${TICK_SEC}s 检查）\n`);
   if (process.platform === 'darwin' && process.env.OPC_WEB_NO_OPEN !== '1') {
     try { spawn('open', [url], { stdio: 'ignore', detached: true }).unref(); } catch {}
   }
