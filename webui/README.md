@@ -97,6 +97,18 @@ data/secrets/bilibili-cookie.txt          # 手动 Cookie，0600，不进 /media
 - 同一时间只允许一个任务（第二次 409）
 - 真实投稿必须二次输入「投稿」；未开启时只预检并记录 `manual_fallback + PUBLISH_DISABLED`
 
+## 部署（静态演示站）
+
+网页本体是 Node 服务，托管平台只能跑「只读快照」版本：
+
+```bash
+node webui/build-static.mjs      # 从本机 4180 抓快照 → webui/dist/（gitignored）
+```
+
+- GitHub Pages：把 `webui/dist/` 提交到 `gh-pages` 分支（`git worktree` 已在 `/private/tmp/opc-ghpages.*`，源码改名后若报 `not a git repository` 需把 `.git` 里的 gitdir 改到新路径）→ 推上去自动发布 https://auulb.github.io/mediaOPC/
+- Vercel：项目 `mediaopc` 的**生产分支就是 `gh-pages`**，推 `gh-pages` 即自动 production 部署 https://mediaopc.vercel.app；推 `main` 只生成 Preview
+- 静态站只读：Cookie / 抓取 / 定时设置等动作由 `webui/public/static-mode.js` 拦截并提示回本地运行
+
 ## 测试
 
 ```bash
