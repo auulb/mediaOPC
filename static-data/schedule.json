@@ -1,0 +1,104 @@
+{
+  "job": {
+    "id": "knowledge-latest",
+    "name": "知识区最新视频",
+    "enabled": true,
+    "times": [
+      "09:00",
+      "19:00"
+    ],
+    "days": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "params": {
+      "tid": 36,
+      "limit": 20,
+      "enrich": true
+    },
+    "updatedAt": "2026-10-24T20:20:23.007Z",
+    "nextRunAt": null
+  },
+  "state": {
+    "lastRunAt": "2026-10-24T20:17:11.951Z",
+    "lastStatus": "success",
+    "lastCount": 20,
+    "lastError": null
+  },
+  "runs": [
+    {
+      "runId": "fetch-manual-20261025-041711",
+      "trigger": "manual",
+      "at": "2026-10-24T20:17:11.951Z",
+      "finishedAt": "2026-10-24T20:17:18.941Z",
+      "status": "success",
+      "count": 20,
+      "cache": false,
+      "durationMs": 6990,
+      "error": null,
+      "message": null
+    }
+  ],
+  "server": {
+    "now": "2026-10-25T02:23:12.301Z",
+    "timezone": "Asia/Shanghai",
+    "intervalSec": 20,
+    "schedulerActive": false,
+    "mode": "no-ai",
+    "staticDemo": true
+  },
+  "zones": [
+    {
+      "tid": 36,
+      "name": "知识（全部）"
+    },
+    {
+      "tid": 201,
+      "name": "科学科普"
+    },
+    {
+      "tid": 124,
+      "name": "社科·法律·心理"
+    },
+    {
+      "tid": 228,
+      "name": "人文历史"
+    },
+    {
+      "tid": 207,
+      "name": "财经商业"
+    },
+    {
+      "tid": 208,
+      "name": "校园学习"
+    },
+    {
+      "tid": 209,
+      "name": "职业职场"
+    },
+    {
+      "tid": 229,
+      "name": "设计·创意"
+    },
+    {
+      "tid": 230,
+      "name": "野生技能"
+    }
+  ],
+  "cookie": {
+    "configured": false,
+    "savedAt": null,
+    "bytes": 0,
+    "hasSessdata": false,
+    "file": "data/secrets/bilibili-cookie.txt",
+    "hint": "未配置：B 站风控（-352）时在数据接口页手动粘贴",
+    "manualOnly": true
+  },
+  "script": "skills/fetch-bilibili-knowledge/scripts/run.mjs",
+  "aiFree": true
+}

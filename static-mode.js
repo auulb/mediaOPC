@@ -6,6 +6,8 @@ window.OPC_STATIC = true;
   const BLOCKED = new Set([
     'start-script', 'render-now', 'rewrite', 'precheck', 'publish-real',
     'fetch-data', 'regen-topics',
+    'fetch-hot', 'fetch-knowledge', 'save-cookie', 'clear-cookie',
+    'save-schedule', 'run-schedule',
   ]);
 
   function note(msg) {

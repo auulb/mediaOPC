@@ -1,5 +1,5 @@
 {
-  "root": "/Users/jwj/Documents/WayToAGI/opc2",
+  "root": "/Users/jwj/Documents/WayToAGI/opc",
   "pipelines": [
     {
       "id": "create-video",
